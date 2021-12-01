@@ -1,0 +1,170 @@
+import { default as ImageLayer } from 'https://esm.run/ol@6.9.0/src/layer/Image';
+import { default as ImageWMS } from 'https://esm.run/ol@6.9.0/src/source/ImageWMS';
+import { default as TileLayer } from 'https://esm.run/ol@6.9.0/src/layer/Tile';
+import { default as WMTS } from 'https://esm.run/ol@6.9.0/src/source/WMTS';
+import { default as WMTSTileGrid } from 'https://esm.run/ol@6.9.0/src/tilegrid/WMTS';
+import { get as getProjection } from 'https://esm.run/ol@6.9.0/src/proj';
+import { getTopLeft, getWidth } from 'https://esm.run/ol@6.9.0/src/extent';
+import { Circle as CircleStyle, Fill, Stroke, Style } from 'https://esm.run/ol@6.9.0/src/style';
+import { default as Map } from 'https://esm.run/ol@6.9.0/src/Map';
+import GeoJSON from 'https://esm.run/ol@6.9.0/src/format/GeoJSON';
+import { default as VectorSource } from 'https://esm.run/ol@6.9.0/src/source/Vector';
+import { default as VectorLayer } from 'https://esm.run/ol@6.9.0/src/layer/Vector';
+import { map } from '../index.js';
+
+const image = new CircleStyle({
+    radius: 5,
+    fill: new Fill({ color: 'red' }),
+    stroke: new Stroke({ color: 'black', width: 2 }),
+});
+const styles = {
+    'Point': new Style({
+        image: image,
+    }),
+    'LineString': new Style({
+        stroke: new Stroke({
+            color: 'green',
+            width: 1,
+        }),
+    }),
+    'MultiLineString': new Style({
+        stroke: new Stroke({
+            color: 'green',
+            width: 1,
+        }),
+    }),
+    'MultiPoint': new Style({
+        image: image,
+    }),
+    'MultiPolygon': new Style({
+        stroke: new Stroke({
+            color: 'yellow',
+            width: 1,
+        }),
+        fill: new Fill({
+            color: 'rgba(255, 255, 0, 0.1)',
+        }),
+    }),
+    'Polygon': new Style({
+        stroke: new Stroke({
+            color: 'blue',
+            lineDash: [4],
+            width: 3,
+        }),
+        fill: new Fill({
+            color: 'rgba(0, 0, 255, 0.1)',
+        }),
+    }),
+    'GeometryCollection': new Style({
+        stroke: new Stroke({
+            color: 'magenta',
+            width: 2,
+        }),
+        fill: new Fill({
+            color: 'magenta',
+        }),
+        image: new CircleStyle({
+            radius: 10,
+            fill: null,
+            stroke: new Stroke({
+                color: 'magenta',
+            }),
+        }),
+    }),
+    'Circle': new Style({
+        stroke: new Stroke({
+            color: 'red',
+            width: 2,
+        }),
+        fill: new Fill({
+            color: 'rgba(255,0,0,0.2)',
+        }),
+    }),
+};
+const styleFunction = function (feature) {
+    return styles[feature.getGeometry().getType()];
+};
+
+const projection = getProjection('EPSG:3857');
+const projectionExtent = projection.getExtent();
+const size = getWidth(projectionExtent) / 256;
+const resolutions = new Array(19);
+const matrixIds = new Array(19);
+for (let z = 0; z < 19; ++z) {
+    // generate resolutions and matrixIds arrays for this WMTS
+    resolutions[z] = size / Math.pow(2, z);
+    matrixIds[z] = z;
+}
+
+const layers = [
+    {{ #baseLayer }}
+    new TileLayer({
+        source: new WMTS({
+            attributions:
+                'Kaartgegevens: © <a href="http://www.cbs.nl">CBS</a>, <a href="http://www.kadaster.nl">Kadaster</a>, <a href="http://openstreetmap.org">OpenStreetMap</a><span class="printhide">-auteurs (<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>).</span>',
+            url: '{{{ serviceUrl }}}',
+            layer: '{{ layerName }}',
+            matrixSet: 'EPSG:3857',
+            format: 'image/png',
+            projection: projection,
+            tileGrid: new WMTSTileGrid({
+                origin: getTopLeft(projectionExtent),
+                resolutions: resolutions,
+                matrixIds: matrixIds,
+            }),
+            style: 'default',
+            wrapX: true,
+        }),
+        {{ #opacity}}
+        opacity: {{ opacity }},
+        {{ /opacity }}
+    }),
+    {{ /baseLayer }}
+    {{#featureCollectionsString}}
+    new VectorLayer({
+        source: new VectorSource({
+            features: new GeoJSON({ featureProjection: 'EPSG:3857'}).readFeatures(
+                '{{{.}}}'
+            ),
+        }),
+        style: styleFunction,
+    }),
+    {{/featureCollectionsString}}
+    {{ #layers}}
+    {{ #isWms }}
+    new ImageLayer({
+        extent: [-100267.6894, 6337518.8850, 1671848.3744, 7255986.2169],
+        source: new ImageWMS({
+            url: '{{{ serviceUrl }}}',
+            params: { 'LAYERS': '{{ layerName }}' },
+            ratio: 1
+        }),
+        {{ #opacity}}
+        opacity: {{ opacity }},
+        {{ /opacity }}
+    }),
+    {{/isWms}}
+    {{/layers}}
+];
+map.setTarget(document.getElementById('map'))
+map.setLayers(layers)
+// promise returning viewOptions is expected instead of View object https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html#setView
+const viewOptions = new Promise((resolve, reject) => {
+    resolve(
+        {{ #location}}
+        {
+            center: [{{ x }}, {{ y }}],
+            zoom: {{ z }},
+        }
+        {{/location}}
+        {{^ location }}
+        {
+            center: [564457.4160, 6783258.6045],
+            zoom: 7,
+        }
+        {{/location}}
+    );
+});
+
+map.setView(viewOptions)
+export { map }
