@@ -130,7 +130,7 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
 }
 
 
-waitForAll(getResourceText('templates/index.html.template'), getResourceText('templates/script.js.template'), getResourceText('default-config.json'), getResourceText('schema.json')).
+waitForAll(getResourceText('./templates/index.html.template'), getResourceText('./templates/script.js.template'), getResourceText('./default-config.json'), getResourceText('./schema.json')).
     then(
         results => {
             console.log(results)
