@@ -5,10 +5,16 @@
     <title>OpenLayers WebMap Generator</title>
     <script> var exports = {};</script>
     <script type="module" src="./index.js"></script>
+    <link href="style.css" rel="stylesheet">
   </head>
   <body>
+    
     <div class="container">
       <div id="map" class="map column"></div>
+      <h1 id="mapTitle" style="display:none;position: absolute;
+      left: 1em;
+      bottom: 1em;
+      padding: 0.5em;"></h1>  
       <div id="rightColumn" class="column">
         <div id="jsonContainer" class="row column">
           <pre id="jsonInput" contenteditable="true">
@@ -31,6 +37,6 @@
 
     </div>
     <link href="https://cdn.jsdelivr.net/npm/ol@6.9.0/ol.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    
   </body>
 </html>

@@ -7,6 +7,9 @@
         "mapAbstract": {
             "type": "string"
         },
+        "constrainBoundsEnabled":{
+            "type": "boolean"
+        },
         "location": {
             "type": "object",
             "properties": {
@@ -20,21 +23,7 @@
                     "type": "integer"
                 }
             }
-        },
-        "baseLayer": {
-            "type": "object",
-            "properties": {
-                "serviceUrl": {
-                    "type": "string"
-                },
-                "layerName": {
-                    "type": "string"
-                },
-                "opacity": {
-                    "type": "number"
-                }
-            }
-        },
+        },      
         "layers": {
             "type": "array",
             "items": {
@@ -46,11 +35,9 @@
                     "layerName": {
                         "type": "string"
                     },
-                    "isWms": {
-                        "type": "boolean"
-                    },
-                    "isWmts": {
-                        "type": "boolean"
+                    "serviceType": {
+                        "type": "string",
+                        "enum": ["WMS", "WMTS"]
                     },
                     "opacity": {
                         "type": "number"
@@ -58,345 +45,229 @@
                 },
                 "required": [
                     "serviceUrl",
-                    "layerName"
+                    "layerName",
+                    "serviceType"
                 ]
             }
         },
-        "featureCollections": {
+        "featureLayers": {
             "type": "array",
             "items": [
                 {
-                    "anyOf": [
-                {
-                    "title": "GeoJSON FeatureCollection",
                     "type": "object",
                     "required": [
-                        "type",
-                        "features"
+                        "source"
                     ],
                     "properties": {
-                        "type": {
-                            "type": "string",
-                            "enum": [
-                                "FeatureCollection"
-                            ]
-                        },
-                        "features": {
-                            "type": "array",
-                            "items": {
-                                "title": "GeoJSON Feature",
-                                "type": "object",
-                                "required": [
-                                    "type",
-                                    "properties",
-                                    "geometry"
-                                ],
-                                "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "Feature"
-                                        ]
-                                    },
-                                    "id": {
-                                        "oneOf": [
-                                            {
-                                                "type": "number"
-                                            },
-                                            {
-                                                "type": "string"
-                                            }
-                                        ]
-                                    },
+                        "source": {
+                            "anyOf": [
+                                {
+                                    "title": "GeoJSON FeatureCollection",
+                                    "type": "object",
+                                    "required": [
+                                        "type",
+                                        "features"
+                                    ],
                                     "properties": {
-                                        "oneOf": [
-                                            {
-                                                "type": "null"
-                                            },
-                                            {
-                                                "type": "object"
-                                            }
-                                        ]
-                                    },
-                                    "geometry": {
-                                        "oneOf": [
-                                            {
-                                                "type": "null"
-                                            },
-                                            {
-                                                "title": "GeoJSON Point",
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "FeatureCollection"
+                                            ]
+                                        },
+                                        "features": {
+                                            "type": "array",
+                                            "items": {
+                                                "title": "GeoJSON Feature",
                                                 "type": "object",
                                                 "required": [
                                                     "type",
-                                                    "coordinates"
+                                                    "properties",
+                                                    "geometry"
                                                 ],
                                                 "properties": {
                                                     "type": {
                                                         "type": "string",
                                                         "enum": [
-                                                            "Point"
+                                                            "Feature"
                                                         ]
                                                     },
-                                                    "coordinates": {
-                                                        "type": "array",
-                                                        "minItems": 2,
-                                                        "items": {
-                                                            "type": "number"
-                                                        }
-                                                    },
-                                                    "bbox": {
-                                                        "type": "array",
-                                                        "minItems": 4,
-                                                        "items": {
-                                                            "type": "number"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "title": "GeoJSON LineString",
-                                                "type": "object",
-                                                "required": [
-                                                    "type",
-                                                    "coordinates"
-                                                ],
-                                                "properties": {
-                                                    "type": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "LineString"
-                                                        ]
-                                                    },
-                                                    "coordinates": {
-                                                        "type": "array",
-                                                        "minItems": 2,
-                                                        "items": {
-                                                            "type": "array",
-                                                            "minItems": 2,
-                                                            "items": {
+                                                    "id": {
+                                                        "oneOf": [
+                                                            {
                                                                 "type": "number"
+                                                            },
+                                                            {
+                                                                "type": "string"
                                                             }
-                                                        }
-                                                    },
-                                                    "bbox": {
-                                                        "type": "array",
-                                                        "minItems": 4,
-                                                        "items": {
-                                                            "type": "number"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "title": "GeoJSON Polygon",
-                                                "type": "object",
-                                                "required": [
-                                                    "type",
-                                                    "coordinates"
-                                                ],
-                                                "properties": {
-                                                    "type": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "Polygon"
                                                         ]
                                                     },
-                                                    "coordinates": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "array",
-                                                            "minItems": 4,
-                                                            "items": {
-                                                                "type": "array",
-                                                                "minItems": 2,
-                                                                "items": {
-                                                                    "type": "number"
-                                                                }
+                                                    "properties": {
+                                                        "oneOf": [
+                                                            {
+                                                                "type": "null"
+                                                            },
+                                                            {
+                                                                "type": "object"
                                                             }
-                                                        }
-                                                    },
-                                                    "bbox": {
-                                                        "type": "array",
-                                                        "minItems": 4,
-                                                        "items": {
-                                                            "type": "number"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "title": "GeoJSON MultiPoint",
-                                                "type": "object",
-                                                "required": [
-                                                    "type",
-                                                    "coordinates"
-                                                ],
-                                                "properties": {
-                                                    "type": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "MultiPoint"
                                                         ]
                                                     },
-                                                    "coordinates": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "array",
-                                                            "minItems": 2,
-                                                            "items": {
-                                                                "type": "number"
-                                                            }
-                                                        }
-                                                    },
-                                                    "bbox": {
-                                                        "type": "array",
-                                                        "minItems": 4,
-                                                        "items": {
-                                                            "type": "number"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "title": "GeoJSON MultiLineString",
-                                                "type": "object",
-                                                "required": [
-                                                    "type",
-                                                    "coordinates"
-                                                ],
-                                                "properties": {
-                                                    "type": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "MultiLineString"
-                                                        ]
-                                                    },
-                                                    "coordinates": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "array",
-                                                            "minItems": 2,
-                                                            "items": {
-                                                                "type": "array",
-                                                                "minItems": 2,
-                                                                "items": {
-                                                                    "type": "number"
-                                                                }
-                                                            }
-                                                        }
-                                                    },
-                                                    "bbox": {
-                                                        "type": "array",
-                                                        "minItems": 4,
-                                                        "items": {
-                                                            "type": "number"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "title": "GeoJSON MultiPolygon",
-                                                "type": "object",
-                                                "required": [
-                                                    "type",
-                                                    "coordinates"
-                                                ],
-                                                "properties": {
-                                                    "type": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "MultiPolygon"
-                                                        ]
-                                                    },
-                                                    "coordinates": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "type": "array",
-                                                                "minItems": 4,
-                                                                "items": {
-                                                                    "type": "array",
-                                                                    "minItems": 2,
-                                                                    "items": {
-                                                                        "type": "number"
+                                                    "geometry": {
+                                                        "oneOf": [
+                                                            {
+                                                                "type": "null"
+                                                            },
+                                                            {
+                                                                "title": "GeoJSON Point",
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "type",
+                                                                    "coordinates"
+                                                                ],
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "Point"
+                                                                        ]
+                                                                    },
+                                                                    "coordinates": {
+                                                                        "type": "array",
+                                                                        "minItems": 2,
+                                                                        "items": {
+                                                                            "type": "number"
+                                                                        }
+                                                                    },
+                                                                    "bbox": {
+                                                                        "type": "array",
+                                                                        "minItems": 4,
+                                                                        "items": {
+                                                                            "type": "number"
+                                                                        }
                                                                     }
                                                                 }
-                                                            }
-                                                        }
-                                                    },
-                                                    "bbox": {
-                                                        "type": "array",
-                                                        "minItems": 4,
-                                                        "items": {
-                                                            "type": "number"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "title": "GeoJSON GeometryCollection",
-                                                "type": "object",
-                                                "required": [
-                                                    "type",
-                                                    "geometries"
-                                                ],
-                                                "properties": {
-                                                    "type": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "GeometryCollection"
-                                                        ]
-                                                    },
-                                                    "geometries": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "oneOf": [
-                                                                {
-                                                                    "title": "GeoJSON Point",
-                                                                    "type": "object",
-                                                                    "required": [
-                                                                        "type",
-                                                                        "coordinates"
-                                                                    ],
-                                                                    "properties": {
-                                                                        "type": {
-                                                                            "type": "string",
-                                                                            "enum": [
-                                                                                "Point"
-                                                                            ]
-                                                                        },
-                                                                        "coordinates": {
+                                                            },
+                                                            {
+                                                                "title": "GeoJSON LineString",
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "type",
+                                                                    "coordinates"
+                                                                ],
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "LineString"
+                                                                        ]
+                                                                    },
+                                                                    "coordinates": {
+                                                                        "type": "array",
+                                                                        "minItems": 2,
+                                                                        "items": {
                                                                             "type": "array",
                                                                             "minItems": 2,
                                                                             "items": {
                                                                                 "type": "number"
                                                                             }
-                                                                        },
-                                                                        "bbox": {
+                                                                        }
+                                                                    },
+                                                                    "bbox": {
+                                                                        "type": "array",
+                                                                        "minItems": 4,
+                                                                        "items": {
+                                                                            "type": "number"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            },
+                                                            {
+                                                                "title": "GeoJSON Polygon",
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "type",
+                                                                    "coordinates"
+                                                                ],
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "Polygon"
+                                                                        ]
+                                                                    },
+                                                                    "coordinates": {
+                                                                        "type": "array",
+                                                                        "items": {
                                                                             "type": "array",
                                                                             "minItems": 4,
+                                                                            "items": {
+                                                                                "type": "array",
+                                                                                "minItems": 2,
+                                                                                "items": {
+                                                                                    "type": "number"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "bbox": {
+                                                                        "type": "array",
+                                                                        "minItems": 4,
+                                                                        "items": {
+                                                                            "type": "number"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            },
+                                                            {
+                                                                "title": "GeoJSON MultiPoint",
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "type",
+                                                                    "coordinates"
+                                                                ],
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "MultiPoint"
+                                                                        ]
+                                                                    },
+                                                                    "coordinates": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "type": "array",
+                                                                            "minItems": 2,
                                                                             "items": {
                                                                                 "type": "number"
                                                                             }
                                                                         }
+                                                                    },
+                                                                    "bbox": {
+                                                                        "type": "array",
+                                                                        "minItems": 4,
+                                                                        "items": {
+                                                                            "type": "number"
+                                                                        }
                                                                     }
-                                                                },
-                                                                {
-                                                                    "title": "GeoJSON LineString",
-                                                                    "type": "object",
-                                                                    "required": [
-                                                                        "type",
-                                                                        "coordinates"
-                                                                    ],
-                                                                    "properties": {
-                                                                        "type": {
-                                                                            "type": "string",
-                                                                            "enum": [
-                                                                                "LineString"
-                                                                            ]
-                                                                        },
-                                                                        "coordinates": {
+                                                                }
+                                                            },
+                                                            {
+                                                                "title": "GeoJSON MultiLineString",
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "type",
+                                                                    "coordinates"
+                                                                ],
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "MultiLineString"
+                                                                        ]
+                                                                    },
+                                                                    "coordinates": {
+                                                                        "type": "array",
+                                                                        "items": {
                                                                             "type": "array",
                                                                             "minItems": 2,
                                                                             "items": {
@@ -406,31 +277,34 @@
                                                                                     "type": "number"
                                                                                 }
                                                                             }
-                                                                        },
-                                                                        "bbox": {
-                                                                            "type": "array",
-                                                                            "minItems": 4,
-                                                                            "items": {
-                                                                                "type": "number"
-                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "bbox": {
+                                                                        "type": "array",
+                                                                        "minItems": 4,
+                                                                        "items": {
+                                                                            "type": "number"
                                                                         }
                                                                     }
-                                                                },
-                                                                {
-                                                                    "title": "GeoJSON Polygon",
-                                                                    "type": "object",
-                                                                    "required": [
-                                                                        "type",
-                                                                        "coordinates"
-                                                                    ],
-                                                                    "properties": {
-                                                                        "type": {
-                                                                            "type": "string",
-                                                                            "enum": [
-                                                                                "Polygon"
-                                                                            ]
-                                                                        },
-                                                                        "coordinates": {
+                                                                }
+                                                            },
+                                                            {
+                                                                "title": "GeoJSON MultiPolygon",
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "type",
+                                                                    "coordinates"
+                                                                ],
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "MultiPolygon"
+                                                                        ]
+                                                                    },
+                                                                    "coordinates": {
+                                                                        "type": "array",
+                                                                        "items": {
                                                                             "type": "array",
                                                                             "items": {
                                                                                 "type": "array",
@@ -443,128 +317,259 @@
                                                                                     }
                                                                                 }
                                                                             }
-                                                                        },
-                                                                        "bbox": {
-                                                                            "type": "array",
-                                                                            "minItems": 4,
-                                                                            "items": {
-                                                                                "type": "number"
-                                                                            }
                                                                         }
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "title": "GeoJSON MultiPoint",
-                                                                    "type": "object",
-                                                                    "required": [
-                                                                        "type",
-                                                                        "coordinates"
-                                                                    ],
-                                                                    "properties": {
-                                                                        "type": {
-                                                                            "type": "string",
-                                                                            "enum": [
-                                                                                "MultiPoint"
-                                                                            ]
-                                                                        },
-                                                                        "coordinates": {
-                                                                            "type": "array",
-                                                                            "items": {
-                                                                                "type": "array",
-                                                                                "minItems": 2,
-                                                                                "items": {
-                                                                                    "type": "number"
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        "bbox": {
-                                                                            "type": "array",
-                                                                            "minItems": 4,
-                                                                            "items": {
-                                                                                "type": "number"
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "title": "GeoJSON MultiLineString",
-                                                                    "type": "object",
-                                                                    "required": [
-                                                                        "type",
-                                                                        "coordinates"
-                                                                    ],
-                                                                    "properties": {
-                                                                        "type": {
-                                                                            "type": "string",
-                                                                            "enum": [
-                                                                                "MultiLineString"
-                                                                            ]
-                                                                        },
-                                                                        "coordinates": {
-                                                                            "type": "array",
-                                                                            "items": {
-                                                                                "type": "array",
-                                                                                "minItems": 2,
-                                                                                "items": {
-                                                                                    "type": "array",
-                                                                                    "minItems": 2,
-                                                                                    "items": {
-                                                                                        "type": "number"
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        "bbox": {
-                                                                            "type": "array",
-                                                                            "minItems": 4,
-                                                                            "items": {
-                                                                                "type": "number"
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "title": "GeoJSON MultiPolygon",
-                                                                    "type": "object",
-                                                                    "required": [
-                                                                        "type",
-                                                                        "coordinates"
-                                                                    ],
-                                                                    "properties": {
-                                                                        "type": {
-                                                                            "type": "string",
-                                                                            "enum": [
-                                                                                "MultiPolygon"
-                                                                            ]
-                                                                        },
-                                                                        "coordinates": {
-                                                                            "type": "array",
-                                                                            "items": {
-                                                                                "type": "array",
-                                                                                "items": {
-                                                                                    "type": "array",
-                                                                                    "minItems": 4,
-                                                                                    "items": {
-                                                                                        "type": "array",
-                                                                                        "minItems": 2,
-                                                                                        "items": {
-                                                                                            "type": "number"
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        "bbox": {
-                                                                            "type": "array",
-                                                                            "minItems": 4,
-                                                                            "items": {
-                                                                                "type": "number"
-                                                                            }
+                                                                    },
+                                                                    "bbox": {
+                                                                        "type": "array",
+                                                                        "minItems": 4,
+                                                                        "items": {
+                                                                            "type": "number"
                                                                         }
                                                                     }
                                                                 }
-                                                            ]
-                                                        }
+                                                            },
+                                                            {
+                                                                "title": "GeoJSON GeometryCollection",
+                                                                "type": "object",
+                                                                "required": [
+                                                                    "type",
+                                                                    "geometries"
+                                                                ],
+                                                                "properties": {
+                                                                    "type": {
+                                                                        "type": "string",
+                                                                        "enum": [
+                                                                            "GeometryCollection"
+                                                                        ]
+                                                                    },
+                                                                    "geometries": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "oneOf": [
+                                                                                {
+                                                                                    "title": "GeoJSON Point",
+                                                                                    "type": "object",
+                                                                                    "required": [
+                                                                                        "type",
+                                                                                        "coordinates"
+                                                                                    ],
+                                                                                    "properties": {
+                                                                                        "type": {
+                                                                                            "type": "string",
+                                                                                            "enum": [
+                                                                                                "Point"
+                                                                                            ]
+                                                                                        },
+                                                                                        "coordinates": {
+                                                                                            "type": "array",
+                                                                                            "minItems": 2,
+                                                                                            "items": {
+                                                                                                "type": "number"
+                                                                                            }
+                                                                                        },
+                                                                                        "bbox": {
+                                                                                            "type": "array",
+                                                                                            "minItems": 4,
+                                                                                            "items": {
+                                                                                                "type": "number"
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    "title": "GeoJSON LineString",
+                                                                                    "type": "object",
+                                                                                    "required": [
+                                                                                        "type",
+                                                                                        "coordinates"
+                                                                                    ],
+                                                                                    "properties": {
+                                                                                        "type": {
+                                                                                            "type": "string",
+                                                                                            "enum": [
+                                                                                                "LineString"
+                                                                                            ]
+                                                                                        },
+                                                                                        "coordinates": {
+                                                                                            "type": "array",
+                                                                                            "minItems": 2,
+                                                                                            "items": {
+                                                                                                "type": "array",
+                                                                                                "minItems": 2,
+                                                                                                "items": {
+                                                                                                    "type": "number"
+                                                                                                }
+                                                                                            }
+                                                                                        },
+                                                                                        "bbox": {
+                                                                                            "type": "array",
+                                                                                            "minItems": 4,
+                                                                                            "items": {
+                                                                                                "type": "number"
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    "title": "GeoJSON Polygon",
+                                                                                    "type": "object",
+                                                                                    "required": [
+                                                                                        "type",
+                                                                                        "coordinates"
+                                                                                    ],
+                                                                                    "properties": {
+                                                                                        "type": {
+                                                                                            "type": "string",
+                                                                                            "enum": [
+                                                                                                "Polygon"
+                                                                                            ]
+                                                                                        },
+                                                                                        "coordinates": {
+                                                                                            "type": "array",
+                                                                                            "items": {
+                                                                                                "type": "array",
+                                                                                                "minItems": 4,
+                                                                                                "items": {
+                                                                                                    "type": "array",
+                                                                                                    "minItems": 2,
+                                                                                                    "items": {
+                                                                                                        "type": "number"
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        },
+                                                                                        "bbox": {
+                                                                                            "type": "array",
+                                                                                            "minItems": 4,
+                                                                                            "items": {
+                                                                                                "type": "number"
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    "title": "GeoJSON MultiPoint",
+                                                                                    "type": "object",
+                                                                                    "required": [
+                                                                                        "type",
+                                                                                        "coordinates"
+                                                                                    ],
+                                                                                    "properties": {
+                                                                                        "type": {
+                                                                                            "type": "string",
+                                                                                            "enum": [
+                                                                                                "MultiPoint"
+                                                                                            ]
+                                                                                        },
+                                                                                        "coordinates": {
+                                                                                            "type": "array",
+                                                                                            "items": {
+                                                                                                "type": "array",
+                                                                                                "minItems": 2,
+                                                                                                "items": {
+                                                                                                    "type": "number"
+                                                                                                }
+                                                                                            }
+                                                                                        },
+                                                                                        "bbox": {
+                                                                                            "type": "array",
+                                                                                            "minItems": 4,
+                                                                                            "items": {
+                                                                                                "type": "number"
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    "title": "GeoJSON MultiLineString",
+                                                                                    "type": "object",
+                                                                                    "required": [
+                                                                                        "type",
+                                                                                        "coordinates"
+                                                                                    ],
+                                                                                    "properties": {
+                                                                                        "type": {
+                                                                                            "type": "string",
+                                                                                            "enum": [
+                                                                                                "MultiLineString"
+                                                                                            ]
+                                                                                        },
+                                                                                        "coordinates": {
+                                                                                            "type": "array",
+                                                                                            "items": {
+                                                                                                "type": "array",
+                                                                                                "minItems": 2,
+                                                                                                "items": {
+                                                                                                    "type": "array",
+                                                                                                    "minItems": 2,
+                                                                                                    "items": {
+                                                                                                        "type": "number"
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        },
+                                                                                        "bbox": {
+                                                                                            "type": "array",
+                                                                                            "minItems": 4,
+                                                                                            "items": {
+                                                                                                "type": "number"
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    "title": "GeoJSON MultiPolygon",
+                                                                                    "type": "object",
+                                                                                    "required": [
+                                                                                        "type",
+                                                                                        "coordinates"
+                                                                                    ],
+                                                                                    "properties": {
+                                                                                        "type": {
+                                                                                            "type": "string",
+                                                                                            "enum": [
+                                                                                                "MultiPolygon"
+                                                                                            ]
+                                                                                        },
+                                                                                        "coordinates": {
+                                                                                            "type": "array",
+                                                                                            "items": {
+                                                                                                "type": "array",
+                                                                                                "items": {
+                                                                                                    "type": "array",
+                                                                                                    "minItems": 4,
+                                                                                                    "items": {
+                                                                                                        "type": "array",
+                                                                                                        "minItems": 2,
+                                                                                                        "items": {
+                                                                                                            "type": "number"
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        },
+                                                                                        "bbox": {
+                                                                                            "type": "array",
+                                                                                            "minItems": 4,
+                                                                                            "items": {
+                                                                                                "type": "number"
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    "bbox": {
+                                                                        "type": "array",
+                                                                        "minItems": 4,
+                                                                        "items": {
+                                                                            "type": "number"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
                                                     },
                                                     "bbox": {
                                                         "type": "array",
@@ -575,31 +580,44 @@
                                                     }
                                                 }
                                             }
-                                        ]
-                                    },
-                                    "bbox": {
-                                        "type": "array",
-                                        "minItems": 4,
-                                        "items": {
-                                            "type": "number"
+                                        },
+                                        "bbox": {
+                                            "type": "array",
+                                            "minItems": 4,
+                                            "items": {
+                                                "type": "number"
+                                            }
                                         }
                                     }
+                                },
+                                {
+                                    "type": "string"
                                 }
-                            }
+                            ]
                         },
-                        "bbox": {
-                            "type": "array",
-                            "minItems": 4,
-                            "items": {
-                                "type": "number"
-                            }
+                        "geomType":{
+                            "type": "string",
+                            "enum": ["Point", "LineString", "Polygon"]
+                        },
+                        "color":{
+                            "anyOf": [
+                                {   "type": "string",
+                                    "pattern": "^(?:black|silver|gray|white|maroon|red|purple|fuchsia|green|lime|olive|yellow|navy|blue|teal|aqua)$"},
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number"
+                                    },
+                                    "minItems": 3,
+                                    "maxItems": 3,
+                                    "uniqueItems": true   
+                                }
+                            ]
+                            
                         }
                     }
-                },
-                {
-                    "type": "string"
                 }
-            ]}
+               
             ]
         }
     },

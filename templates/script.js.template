@@ -12,78 +12,94 @@ import { default as VectorSource } from 'https://esm.run/ol@6.9.0/src/source/Vec
 import { default as VectorLayer } from 'https://esm.run/ol@6.9.0/src/layer/Vector';
 import { map } from './index.js';
 
-const image = new CircleStyle({
-    radius: 5,
-    fill: new Fill({ color: 'red' }),
-    stroke: new Stroke({ color: 'black', width: 2 }),
-});
-const styles = {
-    'Point': new Style({
-        image: image,
+const COLORS = {
+    "black": [0,0,0],
+    "silver": [192,192,192],
+    "gray": [128,128,128],
+    "white": [255,255,255],
+    "maroon": [128,0,0],
+    "red": [255,0,0],
+    "purple": [128,0,128],
+    "fuchsia": [255,0,255],
+    "green": [0,128,0],
+    "lime": [0,255,0],
+    "olive": [128,128,0],
+    "yellow": [255,255,0],
+    "navy": [0,0,128],
+    "blue": [0,0,255],
+    "teal": [0,128,128],
+    "aqua": [0,255,255 ]
+}
+
+function lineStyle(color){
+    if (!color){
+        color= 'green'
+    }
+    return new Style({
+    stroke: new Stroke({
+        color: 'green',
+        width: 1,
     }),
-    'LineString': new Style({
-        stroke: new Stroke({
-            color: 'green',
-            width: 1,
-        }),
-    }),
-    'MultiLineString': new Style({
-        stroke: new Stroke({
-            color: 'green',
-            width: 1,
-        }),
-    }),
-    'MultiPoint': new Style({
-        image: image,
-    }),
-    'MultiPolygon': new Style({
-        stroke: new Stroke({
-            color: 'yellow',
-            width: 1,
-        }),
-        fill: new Fill({
-            color: 'rgba(255, 255, 0, 0.1)',
-        }),
-    }),
-    'Polygon': new Style({
-        stroke: new Stroke({
-            color: 'blue',
-            lineDash: [4],
-            width: 3,
-        }),
-        fill: new Fill({
-            color: 'rgba(0, 0, 255, 0.1)',
-        }),
-    }),
-    'GeometryCollection': new Style({
-        stroke: new Stroke({
-            color: 'magenta',
-            width: 2,
-        }),
-        fill: new Fill({
-            color: 'magenta',
-        }),
+})}
+
+function isStandardColor(color){
+    return Object.keys(COLORS).includes(color)
+}
+
+function pointStyle(color){
+    if (!color){
+        color= 'red'
+    }
+    if (isStandardColor(color)){
+        color = `rgba(${COLORS[color][0]},${COLORS[color][1]},${COLORS[color][2]},0.7)`
+    }else{
+        color = `rgb(${color[0]},${color[1]},${color[2]},0.7)`
+    }
+    return new Style({
         image: new CircleStyle({
-            radius: 10,
-            fill: null,
-            stroke: new Stroke({
-                color: 'magenta',
-            }),
+            radius: 5,
+            fill: new Fill({ color: color }),
+            stroke: new Stroke({ color: 'black', width: 2 }),
         }),
-    }),
-    'Circle': new Style({
+    })
+}
+
+function polygonStyle(color){
+    if (!color){
+        color= 'blue'
+    }
+    let fillColor = ""
+    if (isStandardColor(color)){
+        fillColor = `rgba(${COLORS[color][0]},${COLORS[color][1]},${COLORS[color][2]},0.2)`
+    }else{
+        color = `rgb(${color[0]},${color[1]},${color[2]})`
+        fillColor = `rgba(${color[0]},${color[1]},${color[2]},0.2)`
+    }
+    return  new Style({
         stroke: new Stroke({
-            color: 'red',
+            color: color,
+            lineDash: [4],
             width: 2,
         }),
         fill: new Fill({
-            color: 'rgba(255,0,0,0.2)',
+            color: fillColor,
         }),
-    }),
-};
-const styleFunction = function (feature) {
-    return styles[feature.getGeometry().getType()];
-};
+    })
+}
+
+
+function getStyle(geomtype, color){
+    const styles = {
+        'Point': pointStyle,
+        'LineString': lineStyle,
+        'Polygon':  polygonStyle,
+    };
+    let style  = styles[geomtype]
+    if (color.split(',').length > 2){
+        color = color.split(',')
+    }
+    return style(color)
+}
 
 const projection = getProjection('EPSG:3857');
 const projectionExtent = projection.getExtent();
@@ -97,74 +113,87 @@ for (let z = 0; z < 19; ++z) {
 }
 
 const layers = [
-    {{ #baseLayer }}
-    new TileLayer({
-        source: new WMTS({
-            attributions:
-                'Kaartgegevens: © <a href="http://www.cbs.nl">CBS</a>, <a href="http://www.kadaster.nl">Kadaster</a>, <a href="http://openstreetmap.org">OpenStreetMap</a><span class="printhide">-auteurs (<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>).</span>',
-            url: '{{{ serviceUrl }}}',
-            layer: '{{ layerName }}',
-            matrixSet: 'EPSG:3857',
-            format: 'image/png',
-            projection: projection,
-            tileGrid: new WMTSTileGrid({
-                origin: getTopLeft(projectionExtent),
-                resolutions: resolutions,
-                matrixIds: matrixIds,
-            }),
-            style: 'default',
-            wrapX: true,
-        }),
-        {{ #opacity}}
-        opacity: {{ opacity }},
-        {{ /opacity }}
-    }),
-    {{ /baseLayer }}
-    {{#featureCollectionsString}}
+    {{ #layers}}
+    {{{layer_renderer}}}
+    {{/layers}}
+    {{#featureLayers}}
     new VectorLayer({
         source: new VectorSource({
             features: new GeoJSON({ featureProjection: 'EPSG:3857'}).readFeatures(
-                '{{{.}}}'
+                '{{{ source }}}'
             ),
         }),
-        style: styleFunction,
+        style: getStyle( '{{ geomType }}', '{{ color }}'),
     }),
-    {{/featureCollectionsString}}
-    {{ #layers}}
-    {{ #isWms }}
-    new ImageLayer({
-        extent: [-100267.6894, 6337518.8850, 1671848.3744, 7255986.2169],
-        source: new ImageWMS({
-            url: '{{{ serviceUrl }}}',
-            params: { 'LAYERS': '{{ layerName }}' },
-            ratio: 1
-        }),
-        {{ #opacity}}
-        opacity: {{ opacity }},
-        {{ /opacity }}
-    }),
-    {{/isWms}}
-    {{/layers}}
+    {{/featureLayers}}
 ];
 map.setTarget(document.getElementById('map'))
 map.setLayers(layers)
 // promise returning viewOptions is expected instead of View object https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html#setView
+
+{{#location}}
+let viewConfig = {
+    center: [{{ x }}, {{ y }}],
+    zoom: {{ z }},
+}
+{{/location}}
+{{^location }} //default location
+let viewConfig = {
+    center: [564457.4160, 6783258.6045],
+    zoom: 7,
+}
+{{/location}}
+
+
 const viewOptions = new Promise((resolve, reject) => {
     resolve(
-        {{ #location}}
-        {
-            center: [{{ x }}, {{ y }}],
-            zoom: {{ z }},
-        }
-        {{/location}}
-        {{^ location }}
-        {
-            center: [564457.4160, 6783258.6045],
-            zoom: 7,
-        }
-        {{/location}}
+        viewConfig
     );
 });
-
 map.setView(viewOptions)
+
+{{#constrainBoundsEnabled }}
+map.once('postrender', function(event) {   
+    setTimeout(() => {
+        console.log("HAHHA", map)
+        console.log(viewConfig)
+        let mapExtent = map.getView().calculateExtent(map.getSize())
+        
+        viewConfig.extent = mapExtent
+        const viewOptions = new Promise((resolve, reject) => {
+            resolve(
+                viewConfig
+            );
+        });
+        map.setView(viewOptions)
+    }, 10);
+});
+{{/constrainBoundsEnabled }}
+
+function postRender (evt) {
+    evt.context.globalCompositeOperation = 'color'
+    if (evt.context.globalCompositeOperation === 'color') {
+      // operation is supported by browser
+      evt.context.fillStyle = 'rgba(255,255,255,' + 1 + ')'
+      evt.context.fillRect(
+        0,
+        0,
+        evt.context.canvas.width,
+        evt.context.canvas.height
+      )
+    }
+    evt.context.globalCompositeOperation = 'source-over'
+  }
+
+map
+  .getLayers().forEach(function (lyr) {
+    
+    if (lyr.get('grayscale')) {
+      // see comment on this answer https://stackoverflow.com/a/59819793
+      lyr.on('postrender', postRender)
+    }
+  }
+)
+
+
 export { map }
