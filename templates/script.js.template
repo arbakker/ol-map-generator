@@ -10,7 +10,7 @@ import { default as Map } from 'https://esm.run/ol@6.9.0/src/Map';
 import GeoJSON from 'https://esm.run/ol@6.9.0/src/format/GeoJSON';
 import { default as VectorSource } from 'https://esm.run/ol@6.9.0/src/source/Vector';
 import { default as VectorLayer } from 'https://esm.run/ol@6.9.0/src/layer/Vector';
-import { map } from '../index.js';
+import { map } from './index.js';
 
 const image = new CircleStyle({
     radius: 5,
