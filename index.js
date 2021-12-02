@@ -2,30 +2,30 @@ import { default as Map } from 'https://esm.run/ol@6.9.0/src/Map';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'https://esm.run/ol@6.9.0/src/style';
 import 'https://esm.run/mustache@4.2.0/mustache.js';
 import 'https://cdn.jsdelivr.net/npm/ajv@6.12.6/dist/ajv.bundle.js'; // es6 module import only works for 6.X.X, see https://github.com/ajv-validator/ajv/issues/1381#issue-778838527
-import {htmlEncode, getResourceText } from './util.js';
+import { htmlEncode, getResourceText } from './util.js';
 
 
 const COLORS = {
-    "black": [0,0,0],
-    "silver": [192,192,192],
-    "gray": [128,128,128],
-    "white": [255,255,255],
-    "maroon": [128,0,0],
-    "red": [255,0,0],
-    "purple": [128,0,128],
-    "fuchsia": [255,0,255],
-    "green": [0,128,0],
-    "lime": [0,255,0],
-    "olive": [128,128,0],
-    "yellow": [255,255,0],
-    "navy": [0,0,128],
-    "blue": [0,0,255],
-    "teal": [0,128,128],
-    "aqua": [0,255,255 ]
+    "black": [0, 0, 0],
+    "silver": [192, 192, 192],
+    "gray": [128, 128, 128],
+    "white": [255, 255, 255],
+    "maroon": [128, 0, 0],
+    "red": [255, 0, 0],
+    "purple": [128, 0, 128],
+    "fuchsia": [255, 0, 255],
+    "green": [0, 128, 0],
+    "lime": [0, 255, 0],
+    "olive": [128, 128, 0],
+    "yellow": [255, 255, 0],
+    "navy": [0, 0, 128],
+    "blue": [0, 0, 255],
+    "teal": [0, 128, 128],
+    "aqua": [0, 255, 255]
 }
 
-function getGeometryType(input){
-    let geojsonObj = JSON.parse(input)   
+function getGeometryType (input) {
+    let geojsonObj = JSON.parse(input)
     let geomType = geojsonObj.features[0].geometry.type
     geomType = geomType.replace("Multi", "")
     return geomType
@@ -35,7 +35,7 @@ function getGeometryType(input){
 
 
 // define global map var that is imported by generated code
-var map = {}; 
+var map = {};
 
 function copyToClipboard (button, idEl) {
     const content = document.getElementById(idEl).innerText
@@ -68,12 +68,12 @@ function updateMapState (map) {
     }
     updateJsonConfig(newValue)
 }
-function rgba2hex(orig) {   
-    let  alpha = (orig && orig[4] || "").trim()
+function rgba2hex (orig) {
+    let alpha = (orig && orig[4] || "").trim()
     var hex = (orig[0] | 1 << 8).toString(16).slice(1) +
-      (orig[1] | 1 << 8).toString(16).slice(1) +
-      (orig[2] | 1 << 8).toString(16).slice(1) ;
-  
+        (orig[1] | 1 << 8).toString(16).slice(1) +
+        (orig[2] | 1 << 8).toString(16).slice(1);
+
     if (alpha === "") {
         alpha = 0o1;
     }
@@ -100,29 +100,22 @@ function waitForAll (...ps) {
 }
 
 
-function refreshTitle(title="TEST"){
+function refreshTitle (title = "TEST") {
     let titleEl = document.getElementById("mapTitle")
     titleEl.innerText = title
-    if (title!==""){
-        titleEl.style.display= 'block';
-    }else{
-        titleEl.style.display= 'none';
+    if (title !== "") {
+        titleEl.style.display = 'block';
+    } else {
+        titleEl.style.display = 'none';
     }
 }
 
 function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     document.getElementById('jsonInput').classList.remove('invalid')
     document.getElementById('errorMessage').classList.remove('show')
-
     let config = JSON.parse(document.getElementById("jsonInput").innerText)
-
     const ajv = new Ajv() // options can be passed, e.g. {allErrors: true}
     const validate = ajv.compile(schemaObject)
-
-
-    
-
-
     const valid = validate(
         config
     )
@@ -147,25 +140,22 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     map.on('moveend', function (e) {
         updateMapState(map)
     })
-    refreshTitle(Object.keys(config).includes('mapTitle')? config.mapTitle: '')
-    
+    refreshTitle(Object.keys(config).includes('mapTitle') ? config.mapTitle : '')
+
     // let iconFeatureLayers  = config.featureLayers.filter(x => "icon" in x)
     // let svgUrls = iconFeatureLayers.map(x => `./icons/${x.icon}.svg`)
     // let promises = svgUrls.map(url=> getResourceText(url))
     let promises = []
-    config.featureLayers.forEach(x=>{
-        
-            
+    config.featureLayers.forEach(x => {
         x.geomType = getGeometryType(JSON.stringify(x.source))
-        
-        if ("color" in x){
-            if (x.color in COLORS){
+        if ("color" in x) {
+            if (x.color in COLORS) {
                 x.color = COLORS[x.color]
             }
             x.hexColor = rgba2hex(x.color)
         }
-        if (x.geomType === "Point"){
-            if (!("icon" in x)){
+        if (x.geomType === "Point") {
+            if (!("icon" in x)) {
                 x.icon = "circle"
             }
             let svgUrl = `./icons/${x.icon}.svg`
@@ -182,11 +172,11 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
                         svgIcon = svgIcon.replace('viewBox="0 0 15 15"', 'viewBox="-2 -2 19 19"')
                         x.svgIcon = svgIcon.replace(/\n/g, "")
                     })
-                
             )
         }
     })
 
+    // TODO: move templates to seperate file and fetch with seperate request
     var wmsTemplate = `new ImageLayer({
         extent: [-100267.6894, 6337518.8850, 1671848.3744, 7255986.2169],
         source: new ImageWMS({
@@ -225,15 +215,15 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     }),`
 
     waitForAll(...promises).then(
-        ()=>{
-            config.featureLayers = config.featureLayers.map(x=> {
+        () => {
+            config.featureLayers = config.featureLayers.map(x => {
                 let source = x.source
                 source = JSON.stringify(source)
                 x.source = source
                 return x
             })
-            config["layer_renderer"] = function(){
-                return Mustache.render('{{> ' + this.serviceType  + '}}', this, {WMTS: wmtsTemplate,WMS: wmsTemplate, });
+            config["layer_renderer"] = function () {
+                return Mustache.render('{{> ' + this.serviceType + '}}', this, { WMTS: wmtsTemplate, WMS: wmsTemplate, });
             }
             let jsCode = Mustache.render(
                 codeTemplate
@@ -258,12 +248,12 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
         }
     )
 
-            
-
-   
 
 
-    
+
+
+
+
 }
 
 
