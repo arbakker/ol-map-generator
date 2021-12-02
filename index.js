@@ -100,7 +100,7 @@ function waitForAll (...ps) {
 }
 
 
-function refreshTitle (title = "TEST") {
+function refreshTitle (title) {
     let titleEl = document.getElementById("mapTitle")
     titleEl.innerText = title
     if (title !== "") {
@@ -140,7 +140,7 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     map.on('moveend', function (e) {
         updateMapState(map)
     })
-    refreshTitle(Object.keys(config).includes('mapTitle') ? config.mapTitle : '')
+    refreshTitle(config.title)
 
     // let iconFeatureLayers  = config.featureLayers.filter(x => "icon" in x)
     // let svgUrls = iconFeatureLayers.map(x => `./icons/${x.icon}.svg`)
@@ -228,7 +228,7 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
             let jsCode = Mustache.render(
                 codeTemplate
                 , config);
-            console.log('jsCode', jsCode)
+            // console.log('jsCode', jsCode)
             scriptEl.text = jsCode
             document.head.appendChild(scriptEl)
             // the generated code imports the mapobject from this main script (index.js)
