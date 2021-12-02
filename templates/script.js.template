@@ -43,27 +43,17 @@ function lineStyle (color) {
 
 function pointStyle (color, hexColor, icon = "") {
     let colorString = `rgb(${color[0]},${color[1]},${color[2]})`
-    if (!icon) {
-        return {
-            image: new CircleStyle({
-                radius: 5,
-                fill: new Fill({ color: colorString }),
-                stroke: new Stroke({ color: 'black', width: 2 }),
-            }),
-        }
-    } else if (icon) {
-        // replace 2nd occurence - first path occurence is for white bg halo - https://stackoverflow.com/a/44568739
-        let i=0
-        icon = icon.replace(/<path/g, match => ++i=== 2 ? `<path fill="#${hexColor}"` : match)
-        const src = 'data:image/svg+xml;utf8,' + escape(icon)
-        return              {
-            image: new Icon({
-                opacity: 1,
-                src: src,
-                scale: 2,
-
-            })
-        }
+    // replace 2nd occurence - first path occurence is for white bg halo - https://stackoverflow.com/a/44568739
+    // TOOD: maybe replace to generator code
+    let i=0
+    icon = icon.replace(/<path/g, match => ++i=== 2 ? `<path fill="#${hexColor}"` : match)
+    const src = 'data:image/svg+xml;utf8,' + escape(icon)
+    return              {
+        image: new Icon({
+            opacity: 1,
+            src: src,
+            scale: 1.5,
+        })
     }
 }
 

@@ -120,10 +120,7 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     const validate = ajv.compile(schemaObject)
 
 
-    config.featureLayers.map(x=>{
-        let geomType = getGeometryType(JSON.stringify(x.source))
-        x.geomType = geomType
-    })
+    
 
 
     const valid = validate(
@@ -157,13 +154,20 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     // let promises = svgUrls.map(url=> getResourceText(url))
     let promises = []
     config.featureLayers.forEach(x=>{
+        
+            
+        x.geomType = getGeometryType(JSON.stringify(x.source))
+        
         if ("color" in x){
             if (x.color in COLORS){
                 x.color = COLORS[x.color]
             }
             x.hexColor = rgba2hex(x.color)
         }
-        if ("icon" in x){
+        if (x.geomType === "Point"){
+            if (!("icon" in x)){
+                x.icon = "circle"
+            }
             let svgUrl = `./icons/${x.icon}.svg`
             promises.push(
                 getResourceText(svgUrl).then(
@@ -180,7 +184,6 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
                     })
                 
             )
-            
         }
     })
 
@@ -223,7 +226,7 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
 
     waitForAll(...promises).then(
         ()=>{
-            config.featureLayers = config.featureLayers.map(x=> {   
+            config.featureLayers = config.featureLayers.map(x=> {
                 let source = x.source
                 source = JSON.stringify(source)
                 x.source = source
