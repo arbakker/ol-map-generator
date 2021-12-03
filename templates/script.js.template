@@ -268,7 +268,6 @@ function getDash(config){
 
 function polygonStyle (config) {
     // TODO: fix default colors in generator code
-    
     let colorString = `rgb(${config.color[0]},${config.color[1]},${config.color[2]})`
     let fillColor = `rgba(${config.color[0]},${config.color[1]},${config.color[2]},0.2)`
     if (!("stroke" in config)){
@@ -294,7 +293,6 @@ function polygonStyle (config) {
     }
 }
 
-
 function getStyle (config) {
     const styles = {
         'Point': pointStyle,
@@ -307,7 +305,6 @@ function getStyle (config) {
     }
     return style(config)
 }
-
 
 function getStyleFunction (config) {
     return function (feature, resolution) {
@@ -359,6 +356,18 @@ function getStyleFunction (config) {
     }
 }
 
+function isValidHttpUrl (string) {
+    let url;
+
+    try {
+        url = new URL(string);
+    } catch (_) {
+        return false;
+    }
+
+    return url.protocol === "http:" || url.protocol === "https:";
+}
+
 const projection = getProjection('EPSG:3857');
 const projectionExtent = projection.getExtent();
 const size = getWidth(projectionExtent) / 256;
@@ -370,49 +379,102 @@ for (let z = 0; z < 19; ++z) {
     matrixIds[z] = z;
 }
 
-const layers = [];
+async function getResourceText (filename) {
+    let response = await fetch(filename);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.text();
+}
 
+async function getFeatureData (source, config) {
+    let ftCollection
+    if (isValidHttpUrl(source)){
+        let ftCollectionString = await getResourceText(source)
+        ftCollection = JSON.parse(ftCollectionString)
+    }else{
+        ftCollection = source
+    }
+    return {ftCollection: ftCollection, config: config}
+}
+
+function postRender (evt) {
+    evt.context.globalCompositeOperation = 'color'
+    if (evt.context.globalCompositeOperation === 'color') {
+        // operation is supported by browser
+        evt.context.fillStyle = 'rgba(255,255,255,' + 1 + ')'
+        evt.context.fillRect(
+            0,
+            0,
+            evt.context.canvas.width,
+            evt.context.canvas.height
+        )
+    }
+    evt.context.globalCompositeOperation = 'source-over'
+}
+
+const layers = [];
+// service layers rendered with custom renderer
 {{ #layers}}
 layers.push({{{layer_renderer}}})
 {{/layers}}
 
-let ftLayerConfig = {}
+const promises = [];
 {{#featureLayers}}
-ftLayerConfig = {}
-{{#labels}}
-ftLayerConfig = {...ftLayerConfig, ...{"labels": {{ labels }}, "labelProperty": '{{ labelProperty }}'}}
-{{/labels}}
-{{#icon}}
-ftLayerConfig = {...ftLayerConfig, ...{"svgIcon": '{{{ svgIcon }}}'}}
-{{/icon}}
-{{#iconSize}}
-ftLayerConfig = {...ftLayerConfig, ...{"iconSize": '{{{ iconSize }}}'}}
-{{/iconSize}}
-{{#stroke}}
-ftLayerConfig = {...ftLayerConfig, ...{"stroke": '{{{ stroke }}}'}}
-{{/stroke}}
-{{#width}}
-ftLayerConfig = {...ftLayerConfig, ...{"width": '{{{ width }}}'}}
-{{/width}}
-ftLayerConfig = {...ftLayerConfig, ...{"color": '{{ color }}', "hexColor": '{{ hexColor }}', "geomType": '{{ geomType }}'}}
-layers.push(new VectorLayer({
-    declutter: true,
-    source: new VectorSource({
-        features: new GeoJSON({ featureProjection: 'EPSG:3857'}).readFeatures(
-            '{{{ source }}}'
-        ),
-    }),
-    style: getStyleFunction(
-            ftLayerConfig
-    ),
-    {{ #opacity}}
-    opacity: {{ opacity }},
-    {{ /opacity }}
-}))
+promises.push(
+    getFeatureData(
+        {{{ source }}},
+        {
+            ...{"color": '{{ color }}', "hexColor": '{{ hexColor }}', "geomType": '{{ geomType }}'},
+            {{#width}}
+            ...{"width": '{{{ width }}}'},
+            {{/width}}
+            {{#labels}}
+            ...{"labels": {{ labels }}, "labelProperty": '{{ labelProperty }}'},
+            {{/labels}}
+            {{#icon}}
+            ...{"svgIcon": '{{{ svgIcon }}}'},
+            {{/icon}}
+            {{#iconSize}}
+            ...{"iconSize": '{{{ iconSize }}}'},
+            {{/iconSize}}
+            {{#stroke}}
+            ...{"stroke": '{{{ stroke }}}'},
+            {{/stroke}}
+            {{#opacity}}
+            ...{"opacity": {{ opacity }} },
+            {{/opacity}}
+        }    
+    )
+)
 {{/featureLayers}}
 
+// resolve promises with all to maintain layer order
+Promise.all(promises).then((values) => {
+    values.forEach(result => {
+        layers.push(new VectorLayer({
+            declutter: true,
+            source: new VectorSource({
+                features: new GeoJSON({ featureProjection: 'EPSG:3857' }).readFeatures(result.ftCollection),
+            }),
+            style: getStyleFunction(result.config),
+            opacity: result.config.opacity,
+        })
+        )
+    })
+    map.setLayers(layers)
+    map
+        .getLayers().forEach(lyr => {
+
+            if (lyr.get('grayscale')) {
+                // see comment on this answer https://stackoverflow.com/a/59819793
+                lyr.on('postrender', postRender)
+            }
+        }
+        )
+});
+
 map.setTarget(document.getElementById('map'))
-map.setLayers(layers)
 // promise returning viewOptions is expected instead of View object https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html#setView
 
 {{#location}}
@@ -451,30 +513,8 @@ map.once('postrender', function(event) {
 });
 {{/constrainBoundsEnabled }}
 
-function postRender (evt) {
-    evt.context.globalCompositeOperation = 'color'
-    if (evt.context.globalCompositeOperation === 'color') {
-        // operation is supported by browser
-        evt.context.fillStyle = 'rgba(255,255,255,' + 1 + ')'
-        evt.context.fillRect(
-            0,
-            0,
-            evt.context.canvas.width,
-            evt.context.canvas.height
-        )
-    }
-    evt.context.globalCompositeOperation = 'source-over'
-}
 
-map
-    .getLayers().forEach(function (lyr) {
 
-        if (lyr.get('grayscale')) {
-            // see comment on this answer https://stackoverflow.com/a/59819793
-            lyr.on('postrender', postRender)
-        }
-    }
-    )
 
 if (typeof enableLsControl === 'function'){
     enableLsControl()

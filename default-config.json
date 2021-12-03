@@ -34,15 +34,18 @@
         {
             "serviceType": "WMS",
             "serviceUrl": "https://service.pdok.nl/kadaster/bestuurlijkegebieden/wms/v1_0",
-            "layerName": "Gemeentegebied"
-        },
-        {
-            "serviceType": "WMS",
-            "serviceUrl": "https://service.pdok.nl/kadaster/bestuurlijkegebieden/wms/v1_0",
             "layerName": "Provinciegebied"
         }
     ],
     "featureLayers": [
+      {
+        "source": "https://service.pdok.nl/kadaster/bestuurlijkegebieden/wfs/v1_0?request=GetFeature&service=WFS&version=2.0.0&outputFormat=application/json&srsname=EPSG:4326&startIndex=0&count=20&typename=bestuurlijkegebieden:Gemeentegebied&bbox=181490.21037169415,426974.7956999999,203370.53037169416,462160.71569999994,EPSG:28992",
+        "color": "white",
+        "width": 3,
+        "stroke": [1,5,1,5],
+        "labels": true,
+        "labelProperty": "naam"
+      },
         {
             "color": [18, 39, 58],
             "opacity": 1, 

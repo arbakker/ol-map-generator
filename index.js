@@ -24,15 +24,17 @@ const COLORS = {
     "aqua": [0, 255, 255]
 }
 
-function getGeometryType (input) {
-    let geojsonObj = JSON.parse(input)
-    let geomType = geojsonObj.features[0].geometry.type
-    geomType = geomType.replace("Multi", "")
-    return geomType
+function isValidHttpUrl (string) {
+    let url;
+
+    try {
+        url = new URL(string);
+    } catch (_) {
+        return false;
+    }
+
+    return url.protocol === "http:" || url.protocol === "https:";
 }
-
-
-
 
 // define global map var that is imported by generated code
 var map = {};
@@ -110,6 +112,44 @@ function refreshTitle (title) {
     }
 }
 
+// TODO: add check if returned geometry is valid geojson
+async function getGeometryType (ftLayer) {
+    let ftCollection
+    if (isValidHttpUrl(ftLayer.source)){
+        let ftCollectionString = await getResourceText(ftLayer.source)
+        ftCollection = JSON.parse(ftCollectionString)
+    }else{
+        ftCollection = ftLayer.source
+    }
+    let geomType = ftCollection.features[0].geometry.type
+    geomType = geomType.replace("Multi", "")
+    return geomType
+}
+
+// TODO: improve error handling promises
+async function getFeatureDataAndIcon(ftLayer) {
+    const geomType = await new Promise((resolve, reject) => {
+        resolve(getGeometryType(ftLayer))
+    });
+    ftLayer.geomType = geomType
+    if (geomType === "Point") {
+        if (!("icon" in ftLayer)) {
+            ftLayer.icon = "circle"
+        }
+        let svgUrl = `./icons/${ftLayer.icon}.svg`
+        let svgIcon = await new Promise((resolve, reject) => {
+            resolve(getResourceText(svgUrl))
+        });
+        const regexpSize = /(<path .*?\/>)/;
+        const match = svgIcon.match(regexpSize);
+        let pathEl = match[1]
+        let pathElBg = pathEl.replace('<path', '<path stroke="#ffffffCC" stroke-width="2px"')
+        svgIcon = svgIcon.replace(regexpSize, `${pathElBg}$&`);
+        svgIcon = svgIcon.replace('viewBox="0 0 15 15"', 'viewBox="-2 -2 19 19"')
+        ftLayer.svgIcon = svgIcon.replace(/\n/g, "")
+    }
+   }
+
 function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     document.getElementById('jsonInput').classList.remove('invalid')
     document.getElementById('errorMessage').classList.remove('show')
@@ -147,34 +187,15 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     // let promises = svgUrls.map(url=> getResourceText(url))
     let promises = []
     config.featureLayers.forEach(x => {
-        x.geomType = getGeometryType(JSON.stringify(x.source))
         if ("color" in x) { // TODO: use default color
             if (x.color in COLORS) {
                 x.color = COLORS[x.color]
             }
             x.hexColor = rgba2hex(x.color)
         }
-        
-        if (x.geomType === "Point") {
-            if (!("icon" in x)) {
-                x.icon = "circle"
-            }
-            let svgUrl = `./icons/${x.icon}.svg`
-            promises.push(
-                getResourceText(svgUrl).then(
-                    svgIcon => {
-                        // duplicate path for halo
-                        // easier than duplicating icon style in ol
-                        const regexpSize = /(<path .*?\/>)/;
-                        const match = svgIcon.match(regexpSize);
-                        let pathEl = match[1]
-                        let pathElBg = pathEl.replace('<path', '<path stroke="#ffffffCC" stroke-width="2px"')
-                        svgIcon = svgIcon.replace(regexpSize, `${pathElBg}$&`);
-                        svgIcon = svgIcon.replace('viewBox="0 0 15 15"', 'viewBox="-2 -2 19 19"')
-                        x.svgIcon = svgIcon.replace(/\n/g, "")
-                })
-            )
-        }
+        promises.push(getFeatureDataAndIcon(x).catch((error)=>{
+            console.log(error)
+        }))
     })
 
     // TODO: move templates to seperate file and fetch with seperate request
