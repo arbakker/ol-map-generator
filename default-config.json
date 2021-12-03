@@ -4,37 +4,31 @@
     "lsControlEnabled": true,
     "layers": [
         {
-            "serviceType": "WMTS",
-            "serviceUrl": "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0",
-            "layerName": "standaard",
-            "opacity": 0.75,
-            "grayscale": true
-        },
-        {
             "serviceType": "WMS",
             "serviceUrl": "https://geodata.nationaalgeoregister.nl/ahn3/wms",
             "layerName": "ahn3_05m_dsm",
             "opacity": 1,
-            "grayscale": true
+            "grayscale": 0
         },
         {
             "serviceType": "WMS",
             "serviceUrl": "https://geodata.nationaalgeoregister.nl/ahn3/wms",
             "layerName": "ahn3_5m_dsm",
             "opacity": 1,
-            "grayscale": true
+            "grayscale": 0
         },
         {
             "serviceType": "WMTS",
             "serviceUrl": "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0",
             "layerName": "2021_quick_orthoHR",
             "opacity": 0.75,
-            "grayscale": true
+            "grayscale": 1
         },
         {
             "serviceType": "WMS",
             "serviceUrl": "https://service.pdok.nl/kadaster/bestuurlijkegebieden/wms/v1_0",
-            "layerName": "Provinciegebied"
+            "layerName": "Provinciegebied",
+            "opacity": 0.5
         }
     ],
     "featureLayers": [

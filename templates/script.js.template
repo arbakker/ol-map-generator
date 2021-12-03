@@ -399,10 +399,11 @@ async function getFeatureData (source, config) {
 }
 
 function postRender (evt) {
+    let grayscale = evt.target.get("grayscale")
     evt.context.globalCompositeOperation = 'color'
     if (evt.context.globalCompositeOperation === 'color') {
         // operation is supported by browser
-        evt.context.fillStyle = 'rgba(255,255,255,' + 1 + ')'
+        evt.context.fillStyle = 'rgba(255,255,255,' + grayscale + ')'
         evt.context.fillRect(
             0,
             0,
@@ -465,11 +466,11 @@ Promise.all(promises).then((values) => {
     map.setLayers(layers)
     map
         .getLayers().forEach(lyr => {
-
-            if (lyr.get('grayscale')) {
-                // see comment on this answer https://stackoverflow.com/a/59819793
+            let grayscale = lyr.get('grayscale')
+            if (grayscale>0){
                 lyr.on('postrender', postRender)
             }
+            
         }
         )
 });
