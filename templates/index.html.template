@@ -9,9 +9,9 @@
     </head>
     <body>
         <div id="map" class="map"></div>
-        {{#mapTitle}}
-        <h1 id="mapTitle">{{ mapTitle }}</h1>
-        {{/mapTitle}}
+        {{#title}}
+        <h1 id="mapTitle">{{ title }}</h1>
+        {{/title}}
         <link href="https://cdn.jsdelivr.net/npm/ol@6.9.0/ol.css" rel="stylesheet">
         <style>
             @import url(https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,400italic,700);

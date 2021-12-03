@@ -12,6 +12,166 @@ import { default as VectorSource } from 'https://esm.run/ol@6.9.0/src/source/Vec
 import { default as VectorLayer } from 'https://esm.run/ol@6.9.0/src/layer/Vector';
 import { map } from './index.js';
 
+{{#lsControlEnabled}}
+ /* LocatieServer Control code */
+ import WKT from 'https://esm.run/ol@6.9.0/src/format/WKT'
+ import { Control } from  'https://esm.run/ol@6.9.0/src/control'
+ class LocatieServerControl extends HTMLElement {
+     constructor () {
+       super()
+       const _style = document.createElement('style')
+       const _template = document.createElement('template')
+       this.LS_STYLE =  `
+       button{
+           border: solid 1px #cfd6e6;
+           border-radius: 0 3px 3px 0;
+           border-left: 0px;
+           width: 3em;
+       }
+       .parentControl{
+           background-color: white;
+           height: 36px;
+       }
+       input{
+           outline: none;
+       }
+       input[type=text]{
+           border: solid 1px #cfd6e6;
+           border-radius: 3px;
+           width: 21em;
+           padding-left: 0.5em;
+       }
+       
+       select{
+           border: solid 1px #cfd6e6;
+           border-radius: 3px;
+           width: 10em;
+           padding-left: 0.5em;    
+       }
+       
+       input[type=checkbox] {
+           transform: scale(1.1);
+       }
+       
+       input:focus{
+           border: solid 2px #cfd6e6 !important;
+       }`
+       this.query = ''
+       _style.innerHTML = `
+           ${this.LS_STYLE}
+           #locationServerControl{
+               display: flex;
+               position: absolute;
+               bottom: 0.5em;
+               right: 0.5em;
+           }
+           @media only screen and (max-width: 1024px) {
+             #locationServerControl{
+               bottom: 3em;
+               left: 0.5em;
+             }
+           }
+         `
+       _template.innerHTML = `
+           <div id="locationServerControl" class="parentControl">
+               <input autoComplete="off" id="lsInput" class="control" type="text" placeholder="zoek in locatieserver" title="Zoek in PDOK Locatieserver" list="locatie-auto-complete">
+               <datalist id="locatie-auto-complete"></datalist>
+           </div>
+       `
+       this.LOCATIE_SERVER_URL = 'https://geodata.nationaalgeoregister.nl/locatieserver/v3'
+      
+       this.shadow = this.attachShadow({ mode: 'open' })
+       this.shadow.appendChild(_style)
+       this.shadow.appendChild(_template.content.cloneNode(true))
+   
+       this.shadow.getElementById('lsInput').addEventListener('input', (event) => {
+         if (event.inputType === 'insertReplacementText' || event.inputType === undefined) {
+           const options = this.shadow.getElementById('locatie-auto-complete').querySelectorAll('option')
+           let id = ''
+           for (let option of options) {
+             if (option.value === event.target.value) {
+               id = option.id
+             }
+           }
+           fetch(`${this.LOCATIE_SERVER_URL}/lookup?id=${id}&fl=id,geometrie_ll`)
+             .then((response) => {
+               return response.json()
+             })
+             .then((data) => {
+               const wktLoc = data.response.docs[0].geometrie_ll
+               const format = new WKT()
+               const feature = format.readFeature(wktLoc, {
+                 dataProjection: 'EPSG:4326',
+                 featureProjection: 'EPSG:3857'
+               })
+               const ext = feature.getGeometry().getExtent()
+               this.dispatchEvent(new CustomEvent('location-selected', { bubbles: true, composed: true, detail: { extent: ext, feature: feature } }))
+               this.shadow.getElementById('locatie-auto-complete').innerHTML = ''
+               this.shadow.getElementById('lsInput').blur()
+             })
+         }
+       })
+   
+       this.shadow.getElementById('lsInput').addEventListener('keyup', (e) => {
+         if (this.query === e.target.value) {
+           return
+         }
+         this.query = e.target.value
+         fetch(`${this.LOCATIE_SERVER_URL}/suggest?q=${this.query}`)
+           .then((response) => {
+             return response.json()
+           })
+           .then((data) => {
+             if (data.response.docs.length > 0) {
+               let options = data.response.docs.map(x => `<option value="${x.weergavenaam}" id="${x.id}">`)
+               let optionsHtml = options.join('')
+               this.shadow.getElementById('locatie-auto-complete').innerHTML = optionsHtml
+             }
+           })
+       })
+     }
+     connectedCallback () {
+       this.shadow.addEventListener('keydown', (event) => {
+         event.stopPropagation()
+       })
+     }
+   }
+ if (!customElements.get('locatieserver-control')){
+    customElements.define('locatieserver-control', LocatieServerControl)
+ }
+
+ const lsCOntrol = document.createElement('locatieserver-control')
+
+ function locationSelectedHandler (event) {
+    const layerId = 'lsControlLayer'
+    let style = polygonStyle({color: COLORS["yellow"], stroke: "solid", width: 4 })
+    let ftLayer = new VectorLayer({
+        id: layerId,
+        declutter: true,
+        source: new VectorSource({
+            features: [event.detail.feature]
+        }),
+        style: new Style(style),
+        opacity: 0.4
+    })
+    let existingLsLayer = map.getLayers().getArray().find(x=> {
+        return  'values_' in x && x.values_.id === layerId
+    })
+    if (existingLsLayer){
+        map.removeLayer(existingLsLayer)
+    }
+    map.addLayer(ftLayer)
+    map.getView().fit(event.detail.extent, { maxZoom: 18, padding: [30,30,30,30] })
+ }
+       
+ function enableLsControl () {
+     let myControl = new Control({ element: lsCOntrol })
+     map.addControl(myControl)
+     lsCOntrol.addEventListener('location-selected', locationSelectedHandler, false)
+ }
+ /* LocatieServer Control code */
+ {{/lsControlEnabled}}
+
 const COLORS = {
     "black": [0, 0, 0],
     "silver": [192, 192, 192],
@@ -31,42 +191,89 @@ const COLORS = {
     "aqua": [0, 255, 255]
 }
 
-function lineStyle (color) {
-    let colorString = `rgb(${color[0]},${color[1]},${color[2]})`
+function lineStyle (config) {
+    let colorString = `rgb(${config.color[0]},${config.color[1]},${config.color[2]})`
+    let dash = getDash(config)
     return {
-        stroke: new Stroke({
-            color: colorString,
-            width: 1,
-        }),
+        stroke: new Stroke(
+            {
+                ...{
+                    color: colorString,
+                    width: config.width,
+                },
+                ...dash
+            }
+     )
     }
+
 }
 
-function pointStyle (color, hexColor, icon = "") {
-    let colorString = `rgb(${color[0]},${color[1]},${color[2]})`
+function pointStyle (config) {
     // replace 2nd occurence - first path occurence is for white bg halo - https://stackoverflow.com/a/44568739
     // TOOD: maybe replace to generator code
+    let scale = 1.5
+    if ('iconSize' in config){
+        scale = config.iconSize
+    }
     let i = 0
-    icon = icon.replace(/<path/g, match => ++i === 2 ? `<path fill="#${hexColor}"` : match)
+    let icon = config.svgIcon.replace(/<path/g, match => ++i === 2 ? `<path fill="#${config.hexColor}"` : match)
     const src = 'data:image/svg+xml;utf8,' + escape(icon)
     return {
         image: new Icon({
             opacity: 1,
             src: src,
-            scale: 1.5,
+            scale: scale,
         })
     }
 }
 
-function polygonStyle (color) {
+function getDash(config){
+    const dashDic =  {
+        dashed: {
+            lineDash: [4]
+        },
+        solid : {
+        },
+        dotted: {
+            lineDash: [1, 4, 1, 4]
+        },
+        "dash-dotted":{
+            lineDash: [9, 3, 3, 3]
+        }
+    }
+    let dash
+    if (!(config.stroke.includes(','))){
+        dash = dashDic[config.stroke]
+    }else{
+        dash = {
+            lineDash: config.stroke.split(',')
+        }
+    }
+    return dash
+}
+
+function polygonStyle (config) {
     // TODO: fix default colors in generator code
-    let colorString = `rgb(${color[0]},${color[1]},${color[2]})`
-    let fillColor = `rgba(${color[0]},${color[1]},${color[2]},0.2)`
+    
+    let colorString = `rgb(${config.color[0]},${config.color[1]},${config.color[2]})`
+    let fillColor = `rgba(${config.color[0]},${config.color[1]},${config.color[2]},0.2)`
+    if (!("stroke" in config)){
+        config.stroke="dashed"
+    }
+    if (!("width" in config)){
+        config.width=2
+    }
+    let dash = getDash(config)
     return {
-        stroke: new Stroke({
-            color: colorString,
-            lineDash: [4],
-            width: 2,
-        }),
+        stroke: new Stroke(
+            {
+                ...{
+                    color: colorString,
+                    width: config.width,
+                },
+                ...dash
+            }
+        ),
         fill: new Fill({
             color: fillColor,
         }),
@@ -81,14 +288,10 @@ function getStyle (config) {
         'Polygon': polygonStyle,
     };
     let style = styles[config.geomType]
-    let color = config.color
-    if (color.split(',').length > 2) {
-        color = color.split(',')
+    if ( typeof config.color === 'string' && config.color.split(',').length > 2) {
+        config.color = config.color.split(',')
     }
-    if (config.geomType === "Point" && "svgIcon" in config) {
-        return style(color, config.hexColor, config.svgIcon)
-    }
-    return style(color)
+    return style(config)
 }
 
 
@@ -168,6 +371,15 @@ ftLayerConfig = {...ftLayerConfig, ...{"labels": {{ labels }}, "labelProperty": 
 {{#icon}}
 ftLayerConfig = {...ftLayerConfig, ...{"svgIcon": '{{{ svgIcon }}}'}}
 {{/icon}}
+{{#iconSize}}
+ftLayerConfig = {...ftLayerConfig, ...{"iconSize": '{{{ iconSize }}}'}}
+{{/iconSize}}
+{{#stroke}}
+ftLayerConfig = {...ftLayerConfig, ...{"stroke": '{{{ stroke }}}'}}
+{{/stroke}}
+{{#width}}
+ftLayerConfig = {...ftLayerConfig, ...{"width": '{{{ width }}}'}}
+{{/width}}
 ftLayerConfig = {...ftLayerConfig, ...{"color": '{{ color }}', "hexColor": '{{ hexColor }}', "geomType": '{{ geomType }}'}}
 layers.push(new VectorLayer({
     declutter: true,
@@ -250,4 +462,8 @@ map
     }
     )
 
+if (typeof enableLsControl === 'function'){
+    enableLsControl()
+}
+    
 export { map }

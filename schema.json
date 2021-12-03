@@ -7,8 +7,13 @@
         "mapAbstract": {
             "type": "string"
         },
+        "lsControlEnabled":{
+            "type": "boolean",
+            "default": false
+        },
         "constrainBoundsEnabled":{
-            "type": "boolean"
+            "type": "boolean",
+            "default": false
         },
         "location": {
             "type": "object",
