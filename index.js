@@ -148,12 +148,13 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     let promises = []
     config.featureLayers.forEach(x => {
         x.geomType = getGeometryType(JSON.stringify(x.source))
-        if ("color" in x) {
+        if ("color" in x) { // TODO: use default color
             if (x.color in COLORS) {
                 x.color = COLORS[x.color]
             }
             x.hexColor = rgba2hex(x.color)
         }
+        
         if (x.geomType === "Point") {
             if (!("icon" in x)) {
                 x.icon = "circle"
@@ -171,7 +172,7 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
                         svgIcon = svgIcon.replace(regexpSize, `${pathElBg}$&`);
                         svgIcon = svgIcon.replace('viewBox="0 0 15 15"', 'viewBox="-2 -2 19 19"')
                         x.svgIcon = svgIcon.replace(/\n/g, "")
-                    })
+                })
             )
         }
     })

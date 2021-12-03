@@ -21,7 +21,7 @@ import { map } from './index.js';
        super()
        const _style = document.createElement('style')
        const _template = document.createElement('template')
-       this.LS_STYLE =  `
+       this.LS_STYLE = `
        button{
            border: solid 1px #cfd6e6;
            border-radius: 0 3px 3px 0;
@@ -85,6 +85,8 @@ import { map } from './index.js';
        this.shadow.appendChild(_template.content.cloneNode(true))
    
        this.shadow.getElementById('lsInput').addEventListener('input', (event) => {
+        
+
          if (event.inputType === 'insertReplacementText' || event.inputType === undefined) {
            const options = this.shadow.getElementById('locatie-auto-complete').querySelectorAll('option')
            let id = ''
@@ -109,7 +111,11 @@ import { map } from './index.js';
                this.shadow.getElementById('locatie-auto-complete').innerHTML = ''
                this.shadow.getElementById('lsInput').blur()
              })
-         }
+         }else if (event.inputType.startsWith('deleteContent')){
+            if ( event.target.value===""){
+                this.dispatchEvent(new CustomEvent('location-cleared', { bubbles: true, composed: true, detail: { } }))
+            }
+         } 
        })
    
        this.shadow.getElementById('lsInput').addEventListener('keyup', (e) => {
@@ -140,13 +146,21 @@ import { map } from './index.js';
     customElements.define('locatieserver-control', LocatieServerControl)
  }
 
- const lsCOntrol = document.createElement('locatieserver-control')
+ const lsControl = document.createElement('locatieserver-control')
+ const LS_LAYER_ID = 'lsControlLayer'
+function removeLsLayer(){
+    let existingLsLayer = map.getLayers().getArray().find(x=> {
+        return  'values_' in x && x.values_.id === LS_LAYER_ID
+    })
+    if (existingLsLayer){
+        map.removeLayer(existingLsLayer)
+    }
+}
 
  function locationSelectedHandler (event) {
-    const layerId = 'lsControlLayer'
     let style = polygonStyle({color: COLORS["yellow"], stroke: "solid", width: 4 })
     let ftLayer = new VectorLayer({
-        id: layerId,
+        id: LS_LAYER_ID,
         declutter: true,
         source: new VectorSource({
             features: [event.detail.feature]
@@ -154,20 +168,20 @@ import { map } from './index.js';
         style: new Style(style),
         opacity: 0.4
     })
-    let existingLsLayer = map.getLayers().getArray().find(x=> {
-        return  'values_' in x && x.values_.id === layerId
-    })
-    if (existingLsLayer){
-        map.removeLayer(existingLsLayer)
-    }
+    removeLsLayer()
     map.addLayer(ftLayer)
     map.getView().fit(event.detail.extent, { maxZoom: 18, padding: [30,30,30,30] })
  }
-       
+
+ function locationClearedHandler () {
+    removeLsLayer()
+ }
+
  function enableLsControl () {
-     let myControl = new Control({ element: lsCOntrol })
+     let myControl = new Control({ element: lsControl })
      map.addControl(myControl)
-     lsCOntrol.addEventListener('location-selected', locationSelectedHandler, false)
+     lsControl.addEventListener('location-selected', locationSelectedHandler, false)
+     lsControl.addEventListener('location-cleared', locationClearedHandler, false)
  }
  /* LocatieServer Control code */
  {{/lsControlEnabled}}
