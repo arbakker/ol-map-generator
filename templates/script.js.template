@@ -219,12 +219,11 @@ function lineStyle (config) {
             }
      )
     }
-
 }
 
 function pointStyle (config) {
-    // replace 2nd occurence - first path occurence is for white bg halo - https://stackoverflow.com/a/44568739
-    // TOOD: maybe replace to generator code
+    // replace 2nd occurence in SVG - first path occurence is for white bg halo - https://stackoverflow.com/a/44568739
+    // TOOD: maybe move to generator code
     let scale = 1.5
     if ('iconSize' in config){
         scale = config.iconSize
@@ -256,11 +255,11 @@ function getDash(config){
         }
     }
     let dash
-    if (!(config.stroke.includes(','))){
-        dash = dashDic[config.stroke]
+    if (!Array.isArray(config.stroke)){
+        dash = config.stroke in dashDic ? dashDic[config.stroke]: dashDic["solid"]
     }else{
         dash = {
-            lineDash: config.stroke.split(',')
+            lineDash: config.stroke
         }
     }
     return dash
@@ -387,15 +386,20 @@ async function getResourceText (filename) {
     return await response.text();
 }
 
-async function getFeatureData (source, config) {
-    let ftCollection
-    if (isValidHttpUrl(source)){
-        let ftCollectionString = await getResourceText(source)
-        ftCollection = JSON.parse(ftCollectionString)
+async function getFeatureData (config) { 
+    if (config.layerType === "featureLayer"){
+        let ftCollection
+        if (isValidHttpUrl(config.source)){
+            let ftCollectionString = await getResourceText(config.source)
+            ftCollection = JSON.parse(ftCollectionString)
+        }else{
+            ftCollection = config.source
+        }
+        return {ftCollection: ftCollection, config: config}
     }else{
-        ftCollection = source
+        // optionally retrieve metadata from service
+        return {serviceUrl: config.serviceUrl, config: config}
     }
-    return {ftCollection: ftCollection, config: config}
 }
 
 function postRender (evt) {
@@ -414,54 +418,62 @@ function postRender (evt) {
     evt.context.globalCompositeOperation = 'source-over'
 }
 
-const layers = [];
-// service layers rendered with custom renderer
-{{ #layers}}
-layers.push({{{layer_renderer}}})
-{{/layers}}
 
 const promises = [];
-{{#featureLayers}}
+// service layers rendered with custom renderer
+{{ #layers}}
 promises.push(
     getFeatureData(
-        {{{ source }}},
-        {
-            ...{"color": '{{ color }}', "hexColor": '{{ hexColor }}', "geomType": '{{ geomType }}'},
-            {{#width}}
-            ...{"width": '{{{ width }}}'},
-            {{/width}}
-            {{#labels}}
-            ...{"labels": {{ labels }}, "labelProperty": '{{ labelProperty }}'},
-            {{/labels}}
-            {{#icon}}
-            ...{"svgIcon": '{{{ svgIcon }}}'},
-            {{/icon}}
-            {{#iconSize}}
-            ...{"iconSize": '{{{ iconSize }}}'},
-            {{/iconSize}}
-            {{#stroke}}
-            ...{"stroke": '{{{ stroke }}}'},
-            {{/stroke}}
-            {{#opacity}}
-            ...{"opacity": {{ opacity }} },
-            {{/opacity}}
-        }    
+        {{{.}}}    
     )
 )
-{{/featureLayers}}
+{{/layers}}
+const layers = [];
 
 // resolve promises with all to maintain layer order
 Promise.all(promises).then((values) => {
     values.forEach(result => {
-        layers.push(new VectorLayer({
-            declutter: true,
-            source: new VectorSource({
-                features: new GeoJSON({ featureProjection: 'EPSG:3857' }).readFeatures(result.ftCollection),
-            }),
-            style: getStyleFunction(result.config),
-            opacity: result.config.opacity,
-        })
-        )
+        if (result.config.layerType === "featureLayer"){
+            layers.push(new VectorLayer({
+                declutter: true,
+                source: new VectorSource({
+                    features: new GeoJSON({ featureProjection: 'EPSG:3857' }).readFeatures(result.ftCollection),
+                }),
+                style: getStyleFunction(result.config),
+                opacity: result.config.opacity,
+            }))
+        }else if (result.config.layerType === "serviceLayer"){
+            if (result.config.serviceType === "WMS"){
+                layers.push(new ImageLayer({
+                    source: new ImageWMS({
+                        url: result.config.serviceUrl,
+                        params: { 'LAYERS': result.config.layerName }, // TODO: add style parameter
+                        ratio: 1
+                    }),
+                    ...("grayscale" in result.config && {grayscale: result.config.grayscale}), // add property conditionally
+                    ...("opacity" in result.config && {opacity: result.config.opacity}),
+                }))
+            }else if (result.config.serviceType === "WMTS"){
+                layers.push(new TileLayer({
+                    source: new WMTS({    
+                        url: result.config.serviceUrl,
+                        layer: result.config.layerName,
+                        matrixSet: 'EPSG:3857',
+                        format: 'image/png',
+                        projection: projection,
+                        tileGrid: new WMTSTileGrid({
+                            origin: getTopLeft(projectionExtent),
+                            resolutions: resolutions,
+                            matrixIds: matrixIds,
+                        }),
+                        style: 'default',
+                        wrapX: true,
+                    }),
+                    ...("grayscale" in result.config && {grayscale: result.config.grayscale}), // add property conditionally
+                    ...("opacity" in result.config && {opacity: result.config.opacity}),
+                }))
+            }
+        }
     })
     map.setLayers(layers)
     map
@@ -514,11 +526,7 @@ map.once('postrender', function(event) {
 });
 {{/constrainBoundsEnabled }}
 
-
-
-
-if (typeof enableLsControl === 'function'){
+// enableLsControl if function is defined 
+{{#lsControlEnabled}}
     enableLsControl()
-}
-    
-export { map }
+{{/lsControlEnabled}}

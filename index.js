@@ -128,6 +128,9 @@ async function getGeometryType (ftLayer) {
 
 // TODO: improve error handling promises
 async function getFeatureDataAndIcon(ftLayer) {
+    if (ftLayer.layerType ==="serviceLayer"){
+        return
+    }
     const geomType = await new Promise((resolve, reject) => {
         resolve(getGeometryType(ftLayer))
     });
@@ -186,7 +189,7 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     // let svgUrls = iconFeatureLayers.map(x => `./icons/${x.icon}.svg`)
     // let promises = svgUrls.map(url=> getResourceText(url))
     let promises = []
-    config.featureLayers.forEach(x => {
+    config.layers.forEach(x => {
         if ("color" in x) { // TODO: use default color
             if (x.color in COLORS) {
                 x.color = COLORS[x.color]
@@ -198,55 +201,15 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
         }))
     })
 
-    // TODO: move templates to seperate file and fetch with seperate request
-    var wmsTemplate = `new ImageLayer({
-        extent: [-100267.6894, 6337518.8850, 1671848.3744, 7255986.2169],
-        source: new ImageWMS({
-            url: '{{{ serviceUrl }}}',
-            params: { 'LAYERS': '{{ layerName }}' },
-            ratio: 1
-        }),
-        {{ #opacity}}
-        opacity: {{ opacity }},
-        {{ /opacity }}
-        {{ #grayscale}}
-        grayscale: {{ grayscale }},
-        {{ /grayscale }}
-    }),`
-    var wmtsTemplate = `new TileLayer({
-        source: new WMTS({    
-            url: '{{{ serviceUrl }}}',
-            layer: '{{ layerName }}',
-            matrixSet: 'EPSG:3857',
-            format: 'image/png',
-            projection: projection,
-            tileGrid: new WMTSTileGrid({
-                origin: getTopLeft(projectionExtent),
-                resolutions: resolutions,
-                matrixIds: matrixIds,
-            }),
-            style: 'default',
-            wrapX: true,
-        }),
-        {{ #opacity}}
-        opacity: {{ opacity }},
-        {{ /opacity }}
-        {{ #grayscale}}
-        grayscale: {{ grayscale }},
-        {{ /grayscale }}
-    }),`
+    
+
+    
 
     waitForAll(...promises).then(
         () => {
-            config.featureLayers = config.featureLayers.map(x => {
-                let source = x.source
-                source = JSON.stringify(source)
-                x.source = source
-                return x
+            config.layers = config.layers.map(x => {
+                return JSON.stringify(x)
             })
-            config["layer_renderer"] = function () {
-                return Mustache.render('{{> ' + this.serviceType + '}}', this, { WMTS: wmtsTemplate, WMS: wmsTemplate, });
-            }
             let jsCode = Mustache.render(
                 codeTemplate
                 , config);

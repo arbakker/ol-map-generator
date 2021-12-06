@@ -1,551 +1,564 @@
 {
-    "title": "My Cool Generated Map!",
-    "constrainBoundsEnabled": false,
-    "lsControlEnabled": true,
-    "layers": [
-        {
-            "serviceType": "WMS",
-            "serviceUrl": "https://geodata.nationaalgeoregister.nl/ahn3/wms",
-            "layerName": "ahn3_05m_dsm",
-            "opacity": 1,
-            "grayscale": 0
-        },
-        {
-            "serviceType": "WMS",
-            "serviceUrl": "https://geodata.nationaalgeoregister.nl/ahn3/wms",
-            "layerName": "ahn3_5m_dsm",
-            "opacity": 1,
-            "grayscale": 0
-        },
-        {
-            "serviceType": "WMTS",
-            "serviceUrl": "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0",
-            "layerName": "2021_quick_orthoHR",
-            "opacity": 0.75,
-            "grayscale": 1
-        },
-        {
-            "serviceType": "WMS",
-            "serviceUrl": "https://service.pdok.nl/kadaster/bestuurlijkegebieden/wms/v1_0",
-            "layerName": "Provinciegebied",
-            "opacity": 0.5
-        }
-    ],
-    "featureLayers": [
-      {
-        "source": "https://service.pdok.nl/kadaster/bestuurlijkegebieden/wfs/v1_0?request=GetFeature&service=WFS&version=2.0.0&outputFormat=application/json&srsname=EPSG:4326&startIndex=0&count=20&typename=bestuurlijkegebieden:Gemeentegebied&bbox=181490.21037169415,426974.7956999999,203370.53037169416,462160.71569999994,EPSG:28992",
-        "color": "white",
-        "width": 3,
-        "stroke": [1,5,1,5],
-        "labels": true,
-        "labelProperty": "naam"
-      },
-        {
-            "color": [18, 39, 58],
-            "opacity": 1, 
-            "labels": false,
-            "labelProperty": "label",
-            "icon": "airport",
-            "iconSize": 3,
-            "source": {
-                "type": "FeatureCollection",
-                "name": "punten",
-                "features": [
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "muziekmachine"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.9149526,
-                        51.9784253
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "deviezentekort"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.9032386,
-                        51.9832629
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "hoornblazer"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.8936242,
-                        51.9726268
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "omzetontwikkelingen"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.9051535,
-                        51.9687181
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "configuraties"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.9076766,
-                        51.9816731
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "bereisbaar"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.9183032,
-                        51.9873309
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "huisstofmijten"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.9119014,
-                        51.9898272
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "non-events"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.8933674,
-                        51.9552351
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "bezeert"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.8787953,
-                        51.9507506
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "historiek"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.8788695,
-                        51.9663634
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "morsebel"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.8897616,
-                        51.966108
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "instrumentenbouwers"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.9306353,
-                        51.9565941
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "toevloeiden"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.9542404,
-                        51.970361
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "vaccineerde"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.9321758,
-                        51.9797974
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "bevallingsverhaal"
-                    },
-                    "geometry": {
-                      "type": "Point",
-                      "coordinates": [
-                        5.8710351,
-                        51.9964555
-                      ]
-                    }
-                  }
-                ]
+  "title": "My Cool Generated Map!",
+  "constrainBoundsEnabled": false,
+  "lsControlEnabled": true,
+  "layers": [
+    {
+      "serviceType": "WMS",
+      "serviceUrl": "https://geodata.nationaalgeoregister.nl/ahn3/wms",
+      "layerName": "ahn3_05m_dsm",
+      "opacity": 1,
+      "grayscale": 0,
+      "layerType": "serviceLayer"
+    },
+    {
+      "serviceType": "WMS",
+      "serviceUrl": "https://geodata.nationaalgeoregister.nl/ahn3/wms",
+      "layerName": "ahn3_5m_dsm",
+      "opacity": 1,
+      "grayscale": 0,
+      "layerType": "serviceLayer"
+    },
+    {
+      "serviceType": "WMTS",
+      "serviceUrl": "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0",
+      "layerName": "2021_quick_orthoHR",
+      "opacity": 0.75,
+      "grayscale": 1,
+      "layerType": "serviceLayer"
+    },
+    {
+      "source": "https://service.pdok.nl/kadaster/bestuurlijkegebieden/wfs/v1_0?request=GetFeature&service=WFS&version=2.0.0&outputFormat=application/json&srsname=EPSG:4326&startIndex=0&count=20&typename=bestuurlijkegebieden:Gemeentegebied&bbox=181490.21037169415,426974.7956999999,203370.53037169416,462160.71569999994,EPSG:28992",
+      "color": "white",
+      "width": 3,
+      "stroke": [1,5,1,5],
+      "layerType": "featureLayer",
+      "labels": true,
+      "labelProperty": "naam"
+    },
+    {
+      "serviceType": "WMS",
+      "serviceUrl": "https://service.pdok.nl/kadaster/bestuurlijkegebieden/wms/v1_0",
+      "layerName": "Provinciegebied",
+      "opacity": 0.5,
+      "layerType": "serviceLayer"
+    },
+    {
+      "color": [
+        18,
+        39,
+        58
+      ],
+      "opacity": 1,
+      "labels": false,
+      "labelProperty": "label",
+      "icon": "airport",
+      "iconSize": 3,
+      "layerType": "featureLayer",
+      "source": {
+        "type": "FeatureCollection",
+        "name": "punten",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "muziekmachine"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.9149526,
+                51.9784253
+              ]
             }
-        },
-        {
-            "source": {
-                "type": "FeatureCollection",
-                "name": "polygonen",
-                "features": [
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "instantané"
-                    },
-                    "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [
-                        [
-                          [
-                            5.8549322,
-                            51.9856334
-                          ],
-                          [
-                            5.8352892,
-                            51.9881027
-                          ],
-                          [
-                            5.8357557,
-                            51.9863063
-                          ],
-                          [
-                            5.8457046,
-                            51.9833368
-                          ],
-                          [
-                            5.8448893,
-                            51.9793918
-                          ],
-                          [
-                            5.8477009,
-                            51.9796201
-                          ],
-                          [
-                            5.8502486,
-                            51.9824217
-                          ],
-                          [
-                            5.8523891,
-                            51.9833105
-                          ],
-                          [
-                            5.8549322,
-                            51.9856334
-                          ]
-                        ]
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "wedstrijdloop"
-                    },
-                    "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [
-                        [
-                          [
-                            5.9046875,
-                            51.9860382
-                          ],
-                          [
-                            5.9067867,
-                            51.9874347
-                          ],
-                          [
-                            5.9078383,
-                            51.9882975
-                          ],
-                          [
-                            5.9066504,
-                            51.988213
-                          ],
-                          [
-                            5.9058045,
-                            51.9883812
-                          ],
-                          [
-                            5.9046474,
-                            51.9888649
-                          ],
-                          [
-                            5.9034171,
-                            51.989304
-                          ],
-                          [
-                            5.9019171,
-                            51.9894601
-                          ],
-                          [
-                            5.901094,
-                            51.9895086
-                          ],
-                          [
-                            5.9011875,
-                            51.9892091
-                          ],
-                          [
-                            5.9021971,
-                            51.9885317
-                          ],
-                          [
-                            5.902553,
-                            51.987887
-                          ],
-                          [
-                            5.9026205,
-                            51.9874381
-                          ],
-                          [
-                            5.9024248,
-                            51.9872744
-                          ],
-                          [
-                            5.9023987,
-                            51.98711
-                          ],
-                          [
-                            5.9033638,
-                            51.9867768
-                          ],
-                          [
-                            5.9046875,
-                            51.9860382
-                          ]
-                        ]
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "letterwiel"
-                    },
-                    "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [
-                        [
-                          [
-                            5.890176,
-                            51.9253235
-                          ],
-                          [
-                            5.8990184,
-                            51.9201408
-                          ],
-                          [
-                            5.9043958,
-                            51.9166476
-                          ],
-                          [
-                            5.9129602,
-                            51.912781
-                          ],
-                          [
-                            5.9147761,
-                            51.9109185
-                          ],
-                          [
-                            5.9169286,
-                            51.9130025
-                          ],
-                          [
-                            5.9204291,
-                            51.914542
-                          ],
-                          [
-                            5.9263589,
-                            51.9169676
-                          ],
-                          [
-                            5.9240602,
-                            51.9188924
-                          ],
-                          [
-                            5.9181106,
-                            51.9229873
-                          ],
-                          [
-                            5.9123563,
-                            51.9273202
-                          ],
-                          [
-                            5.9060105,
-                            51.930818
-                          ],
-                          [
-                            5.8984017,
-                            51.933962
-                          ],
-                          [
-                            5.890176,
-                            51.9253235
-                          ]
-                        ]
-                      ]
-                    }
-                  },
-                  {
-                    "type": "Feature",
-                    "properties": {
-                      "label": "vaatdoek"
-                    },
-                    "geometry": {
-                      "type": "Polygon",
-                      "coordinates": [
-                        [
-                          [
-                            6.0174086,
-                            52.006246
-                          ],
-                          [
-                            6.018508,
-                            52.0051633
-                          ],
-                          [
-                            6.0194207,
-                            52.0045901
-                          ],
-                          [
-                            6.0214463,
-                            52.0038913
-                          ],
-                          [
-                            6.0259343,
-                            52.0025509
-                          ],
-                          [
-                            6.0280098,
-                            52.0019714
-                          ],
-                          [
-                            6.0293182,
-                            52.0019642
-                          ],
-                          [
-                            6.0310665,
-                            52.0022239
-                          ],
-                          [
-                            6.0323796,
-                            52.0025457
-                          ],
-                          [
-                            6.0358413,
-                            52.0039923
-                          ],
-                          [
-                            6.0361883,
-                            52.0045287
-                          ],
-                          [
-                            6.0368191,
-                            52.0045851
-                          ],
-                          [
-                            6.0385541,
-                            52.0039174
-                          ],
-                          [
-                            6.0416455,
-                            52.0065324
-                          ],
-                          [
-                            6.0398296,
-                            52.0083072
-                          ],
-                          [
-                            6.0425651,
-                            52.0130777
-                          ],
-                          [
-                            6.0174086,
-                            52.006246
-                          ]
-                        ]
-                      ]
-                    }
-                  }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "deviezentekort"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.9032386,
+                51.9832629
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "hoornblazer"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.8936242,
+                51.9726268
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "omzetontwikkelingen"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.9051535,
+                51.9687181
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "configuraties"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.9076766,
+                51.9816731
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "bereisbaar"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.9183032,
+                51.9873309
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "huisstofmijten"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.9119014,
+                51.9898272
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "non-events"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.8933674,
+                51.9552351
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "bezeert"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.8787953,
+                51.9507506
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "historiek"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.8788695,
+                51.9663634
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "morsebel"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.8897616,
+                51.966108
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "instrumentenbouwers"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.9306353,
+                51.9565941
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "toevloeiden"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.9542404,
+                51.970361
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "vaccineerde"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.9321758,
+                51.9797974
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "bevallingsverhaal"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                5.8710351,
+                51.9964555
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "source": {
+        "type": "FeatureCollection",
+        "name": "polygonen",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "instantané"
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    5.8549322,
+                    51.9856334
+                  ],
+                  [
+                    5.8352892,
+                    51.9881027
+                  ],
+                  [
+                    5.8357557,
+                    51.9863063
+                  ],
+                  [
+                    5.8457046,
+                    51.9833368
+                  ],
+                  [
+                    5.8448893,
+                    51.9793918
+                  ],
+                  [
+                    5.8477009,
+                    51.9796201
+                  ],
+                  [
+                    5.8502486,
+                    51.9824217
+                  ],
+                  [
+                    5.8523891,
+                    51.9833105
+                  ],
+                  [
+                    5.8549322,
+                    51.9856334
+                  ]
                 ]
-              }
-              ,
-            "color": [209, 56, 56],
-            "labels": true,
-            "labelProperty": "label",
-            "stroke": "dotted"
-        }
-        ],
-        "location": {
-            "x": 657505.1356963534,
-            "y": 6793455.834954642,
-            "z": 13
-        }
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "wedstrijdloop"
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    5.9046875,
+                    51.9860382
+                  ],
+                  [
+                    5.9067867,
+                    51.9874347
+                  ],
+                  [
+                    5.9078383,
+                    51.9882975
+                  ],
+                  [
+                    5.9066504,
+                    51.988213
+                  ],
+                  [
+                    5.9058045,
+                    51.9883812
+                  ],
+                  [
+                    5.9046474,
+                    51.9888649
+                  ],
+                  [
+                    5.9034171,
+                    51.989304
+                  ],
+                  [
+                    5.9019171,
+                    51.9894601
+                  ],
+                  [
+                    5.901094,
+                    51.9895086
+                  ],
+                  [
+                    5.9011875,
+                    51.9892091
+                  ],
+                  [
+                    5.9021971,
+                    51.9885317
+                  ],
+                  [
+                    5.902553,
+                    51.987887
+                  ],
+                  [
+                    5.9026205,
+                    51.9874381
+                  ],
+                  [
+                    5.9024248,
+                    51.9872744
+                  ],
+                  [
+                    5.9023987,
+                    51.98711
+                  ],
+                  [
+                    5.9033638,
+                    51.9867768
+                  ],
+                  [
+                    5.9046875,
+                    51.9860382
+                  ]
+                ]
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "letterwiel"
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    5.890176,
+                    51.9253235
+                  ],
+                  [
+                    5.8990184,
+                    51.9201408
+                  ],
+                  [
+                    5.9043958,
+                    51.9166476
+                  ],
+                  [
+                    5.9129602,
+                    51.912781
+                  ],
+                  [
+                    5.9147761,
+                    51.9109185
+                  ],
+                  [
+                    5.9169286,
+                    51.9130025
+                  ],
+                  [
+                    5.9204291,
+                    51.914542
+                  ],
+                  [
+                    5.9263589,
+                    51.9169676
+                  ],
+                  [
+                    5.9240602,
+                    51.9188924
+                  ],
+                  [
+                    5.9181106,
+                    51.9229873
+                  ],
+                  [
+                    5.9123563,
+                    51.9273202
+                  ],
+                  [
+                    5.9060105,
+                    51.930818
+                  ],
+                  [
+                    5.8984017,
+                    51.933962
+                  ],
+                  [
+                    5.890176,
+                    51.9253235
+                  ]
+                ]
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "label": "vaatdoek"
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    6.0174086,
+                    52.006246
+                  ],
+                  [
+                    6.018508,
+                    52.0051633
+                  ],
+                  [
+                    6.0194207,
+                    52.0045901
+                  ],
+                  [
+                    6.0214463,
+                    52.0038913
+                  ],
+                  [
+                    6.0259343,
+                    52.0025509
+                  ],
+                  [
+                    6.0280098,
+                    52.0019714
+                  ],
+                  [
+                    6.0293182,
+                    52.0019642
+                  ],
+                  [
+                    6.0310665,
+                    52.0022239
+                  ],
+                  [
+                    6.0323796,
+                    52.0025457
+                  ],
+                  [
+                    6.0358413,
+                    52.0039923
+                  ],
+                  [
+                    6.0361883,
+                    52.0045287
+                  ],
+                  [
+                    6.0368191,
+                    52.0045851
+                  ],
+                  [
+                    6.0385541,
+                    52.0039174
+                  ],
+                  [
+                    6.0416455,
+                    52.0065324
+                  ],
+                  [
+                    6.0398296,
+                    52.0083072
+                  ],
+                  [
+                    6.0425651,
+                    52.0130777
+                  ],
+                  [
+                    6.0174086,
+                    52.006246
+                  ]
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      "color": [
+        209,
+        56,
+        56
+      ],
+      "labels": true,
+      "labelProperty": "label",
+      "stroke": "dotted",
+      "layerType": "featureLayer"
     }
+   
+  ],
+  "location": {
+    "x": 657505.1356963534,
+    "y": 6793455.834954642,
+    "z": 13
+  }
+}
