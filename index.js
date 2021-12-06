@@ -2,157 +2,14 @@ import { default as Map } from 'https://esm.run/ol@6.9.0/src/Map';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'https://esm.run/ol@6.9.0/src/style';
 import 'https://esm.run/mustache@4.2.0/mustache.js';
 import 'https://cdn.jsdelivr.net/npm/ajv@6.12.6/dist/ajv.bundle.js'; // es6 module import only works for 6.X.X, see https://github.com/ajv-validator/ajv/issues/1381#issue-778838527
-import { htmlEncode, getResourceText } from './util.js';
+import { htmlEncode, getResourceText, getFeatureDataAndIcon, refreshTitle, waitForAll, updateMapState, rgba2hex, copyToClipboard, COLORS }from './util.js';
 
-
-const COLORS = {
-    "black": [0, 0, 0],
-    "silver": [192, 192, 192],
-    "gray": [128, 128, 128],
-    "white": [255, 255, 255],
-    "maroon": [128, 0, 0],
-    "red": [255, 0, 0],
-    "purple": [128, 0, 128],
-    "fuchsia": [255, 0, 255],
-    "green": [0, 128, 0],
-    "lime": [0, 255, 0],
-    "olive": [128, 128, 0],
-    "yellow": [255, 255, 0],
-    "navy": [0, 0, 128],
-    "blue": [0, 0, 255],
-    "teal": [0, 128, 128],
-    "aqua": [0, 255, 255]
-}
-
-function isValidHttpUrl (string) {
-    let url;
-
-    try {
-        url = new URL(string);
-    } catch (_) {
-        return false;
-    }
-
-    return url.protocol === "http:" || url.protocol === "https:";
-}
 
 // define global map var that is imported by generated code
 var map = {};
 
-function copyToClipboard (button, idEl) {
-    const content = document.getElementById(idEl).innerText
-    navigator.clipboard.writeText(content).then(function () {
-        button.classList.add('button-ok')
-        setTimeout(() => {
-            button.classList.remove('button-ok')
-        }, 300)
-    }, function (err) {
-        button.classList.add('button-notok')
-        alert(err)
-        setTimeout(() => {
-            button.classList.remove('button-notok')
-        }, 300)
-    });
-}
 
-function updateMapState (map) {
-    const view = map.getView()
-    const center = view.getCenter()
-    const x = parseFloat(center[0].toString())
-    const y = parseFloat(center[1].toString())
-    const z = parseInt(view.getZoom().toString())
-    const newValue = {
-        location: {
-            x: x,
-            y: y,
-            z: z
-        }
-    }
-    updateJsonConfig(newValue)
-}
-function rgba2hex (orig) {
-    let alpha = (orig && orig[4] || "").trim()
-    var hex = (orig[0] | 1 << 8).toString(16).slice(1) +
-        (orig[1] | 1 << 8).toString(16).slice(1) +
-        (orig[2] | 1 << 8).toString(16).slice(1);
-
-    if (alpha === "") {
-        alpha = 0o1;
-    }
-    // multiply before convert to HEX
-    alpha = ((alpha * 255) | 1 << 8).toString(16).slice(1)
-    hex = hex + alpha;
-    return hex;
-}
-function updateJsonConfig (value) {
-    let config = JSON.parse(document.getElementById("jsonInput").innerText)
-    const newConfig = Object.assign(config, value);
-    document.getElementById("jsonInput").innerText = JSON.stringify(newConfig, null, 4)
-}
-
-
-
-function handleRejection (p) {
-    return p.catch((error) => ({
-        error
-    }))
-}
-function waitForAll (...ps) {
-    return Promise.all(ps.map(handleRejection))
-}
-
-
-function refreshTitle (title) {
-    let titleEl = document.getElementById("mapTitle")
-    titleEl.innerText = title
-    if (title !== "") {
-        titleEl.style.display = 'block';
-    } else {
-        titleEl.style.display = 'none';
-    }
-}
-
-// TODO: add check if returned geometry is valid geojson
-async function getGeometryType (ftLayer) {
-    let ftCollection
-    if (isValidHttpUrl(ftLayer.source)){
-        let ftCollectionString = await getResourceText(ftLayer.source)
-        ftCollection = JSON.parse(ftCollectionString)
-    }else{
-        ftCollection = ftLayer.source
-    }
-    let geomType = ftCollection.features[0].geometry.type
-    geomType = geomType.replace("Multi", "")
-    return geomType
-}
-
-// TODO: improve error handling promises
-async function getFeatureDataAndIcon(ftLayer) {
-    if (ftLayer.layerType ==="serviceLayer"){
-        return
-    }
-    const geomType = await new Promise((resolve, reject) => {
-        resolve(getGeometryType(ftLayer))
-    });
-    ftLayer.geomType = geomType
-    if (geomType === "Point") {
-        if (!("icon" in ftLayer)) {
-            ftLayer.icon = "circle"
-        }
-        let svgUrl = `./icons/${ftLayer.icon}.svg`
-        let svgIcon = await new Promise((resolve, reject) => {
-            resolve(getResourceText(svgUrl))
-        });
-        const regexpSize = /(<path .*?\/>)/;
-        const match = svgIcon.match(regexpSize);
-        let pathEl = match[1]
-        let pathElBg = pathEl.replace('<path', '<path stroke="#ffffffCC" stroke-width="2px"')
-        svgIcon = svgIcon.replace(regexpSize, `${pathElBg}$&`);
-        svgIcon = svgIcon.replace('viewBox="0 0 15 15"', 'viewBox="-2 -2 19 19"')
-        ftLayer.svgIcon = svgIcon.replace(/\n/g, "")
-    }
-   }
-
+// TODO: split up function in components
 function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
     document.getElementById('jsonInput').classList.remove('invalid')
     document.getElementById('errorMessage').classList.remove('show')
@@ -200,11 +57,6 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
             console.log(error)
         }))
     })
-
-    
-
-    
-
     waitForAll(...promises).then(
         () => {
             config.layers = config.layers.map(x => {
@@ -232,31 +84,21 @@ function refreshMap (htmlTemplate, codeTemplate, schemaObject) {
             document.getElementById('htmlOutput').innerHTML = htmlCodeEncoded
         }
     )
-
-
-
-
-
-
-
 }
 
-
 waitForAll(getResourceText('./templates/index.html.template'), getResourceText('./templates/script.js.template'), getResourceText('./default-config.json'), getResourceText('./schema.json')).
-    then(
-        results => {
-            const htmlTemplate = results[0]
-            const codeTemplate = results[1]
-            const initConfig = JSON.parse(results[2])
-            const jsonSchema = JSON.parse(results[3])
-            document.getElementById("jsonInput").innerText = JSON.stringify(initConfig, null, 4)
-            refreshMap(htmlTemplate, codeTemplate, jsonSchema)
-            document.getElementById('refresh').addEventListener('click', (e) => refreshMap(htmlTemplate, codeTemplate, jsonSchema))
-            document.getElementById('copyHTML').addEventListener('click', (e) => copyToClipboard(e.target, 'htmlOutput'))
-            document.getElementById('copyJSON').addEventListener('click', (e) => copyToClipboard(e.target, 'jsonInput'))
-        }
-    );
-
-
+then(
+    results => {
+        const htmlTemplate = results[0]
+        const codeTemplate = results[1]
+        const initConfig = JSON.parse(results[2])
+        const jsonSchema = JSON.parse(results[3])
+        document.getElementById("jsonInput").innerText = JSON.stringify(initConfig, null, 4)
+        refreshMap(htmlTemplate, codeTemplate, jsonSchema)
+        document.getElementById('refresh').addEventListener('click', (e) => refreshMap(htmlTemplate, codeTemplate, jsonSchema))
+        document.getElementById('copyHTML').addEventListener('click', (e) => copyToClipboard(e.target, 'htmlOutput'))
+        document.getElementById('copyJSON').addEventListener('click', (e) => copyToClipboard(e.target, 'jsonInput'))
+    }
+);
 
 export { map }
