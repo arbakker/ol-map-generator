@@ -1,0 +1,93 @@
+{
+    "title": "My Cool Generated Map!",
+    "constrainBoundsEnabled": false,
+    "lsControlEnabled": true,
+    "layers": [
+        {
+            "id": "77d6c119-b1c2-4e50-8a9b-a6ebfdca1777",
+            "serviceType": "WMTS",
+            "serviceUrl": "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0",
+            "layerName": "2021_quick_orthoHR",
+            "opacity": 0.5,
+            "grayscale": 1,
+            "layerType": "serviceLayer",
+            "title": "Landelijke Voorziening Beeldmateriaal - Luchtfoto 2021 Quick Ortho HR"
+        },
+        {
+            "id": "4f2fc40e-4a06-4c68-accd-877db2d30695",
+            "serviceType": "WMTS",
+            "serviceUrl": "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0",
+            "layerName": "standaard",
+            "opacity": 1,
+            "grayscale": 0,
+            "layerType": "serviceLayer",
+            "title": "BRT Achtergrondkaart - Standaard"
+          },
+        {
+            "id": "080e6785-fd63-4b5f-828d-030db6da7334",
+            "color": [
+                18,
+                39,
+                58
+            ],
+            "title": "Featurelaag - Punten",
+            "opacity": 1,
+            "labels": true,
+            "labelProperty": "benaming",
+            "icon": "marker",
+            "iconSize": 2,
+            "layerType": "featureLayer",
+            "source": 
+            {
+                "type": "FeatureCollection",
+                "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                "features": [
+                { "type": "Feature", "properties": { "msFID": "102", "gid": "102", "blad": "000", "punt": "305", "bladdeel": "", "uitgavejaarext": "2017", "uitgavevolgext": "2", "benaming": "GNSS ref.stat. NLAH Arnhem", "ingerekend": "Ja", "honum": "11", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "192390", "yrd": "442864", "gps": "1", "afbeelding": "" }, "geometry": { "type": "Point", "coordinates": [ 5.931350067887865, 51.972929324851222 ] } },
+                { "type": "Feature", "properties": { "msFID": "685", "gid": "685", "blad": "339", "punt": "101", "bladdeel": "D", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "Steen R.D. Imbosch", "ingerekend": "Ja", "honum": "14", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "196959", "yrd": "450163", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/339\/339101.jpg" }, "geometry": { "type": "Point", "coordinates": [ 5.998735216047266, 52.038204244922746 ] } },
+                { "type": "Feature", "properties": { "msFID": "2546", "gid": "2546", "blad": "339", "punt": "313", "bladdeel": "D", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "Brandtoren Koningsweg Arnhem", "ingerekend": "Ja", "honum": "12", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "196205", "yrd": "450352", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/339\/339313.jpg" }, "geometry": { "type": "Point", "coordinates": [ 5.987769401824178, 52.039959495684819 ] } },
+                { "type": "Feature", "properties": { "msFID": "2563", "gid": "2563", "blad": "339", "punt": "336", "bladdeel": "D", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "Steen R.D. Rozendaalse veld", "ingerekend": "Ja", "honum": "13", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "194716", "yrd": "451101", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/339\/339336.jpg" }, "geometry": { "type": "Point", "coordinates": [ 5.966155248525001, 52.046800016299891 ] } },
+                { "type": "Feature", "properties": { "msFID": "2565", "gid": "2565", "blad": "339", "punt": "339", "bladdeel": "C", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "Steen R.D. Oud Reemster Veld", "ingerekend": "Ja", "honum": "13", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "186434", "yrd": "452027", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/339\/339339.jpg" }, "geometry": { "type": "Point", "coordinates": [ 5.845515449210607, 52.05565458880168 ] } },
+                { "type": "Feature", "properties": { "msFID": "2572", "gid": "2572", "blad": "339", "punt": "349", "bladdeel": "D", "uitgavejaarext": "2013", "uitgavevolgext": "2", "benaming": "Viaduct Koningsweg Arnhem", "ingerekend": "Ja", "honum": "13", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "192338", "yrd": "450139", "gps": "1", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/339\/339349.jpg" }, "geometry": { "type": "Point", "coordinates": [ 5.93138683934352, 52.038319158583398 ] } },
+                { "type": "Feature", "properties": { "msFID": "2575", "gid": "2575", "blad": "339", "punt": "511", "bladdeel": "C", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "Steen R.D. Kemperheide", "ingerekend": "Ja", "honum": "14", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "187202", "yrd": "450897", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/339\/339511.jpg" }, "geometry": { "type": "Point", "coordinates": [ 5.856606095635948, 52.04545421365497 ] } },
+                { "type": "Feature", "properties": { "msFID": "3174", "gid": "3174", "blad": "400", "punt": "312", "bladdeel": "C", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "R.K.K. Oud-Zevenaar", "ingerekend": "Ja", "honum": "12", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "202871", "yrd": "436303", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/400\/400312.jpg" }, "geometry": { "type": "Point", "coordinates": [ 6.082958939957803, 51.91315639956224 ] } },
+                { "type": "Feature", "properties": { "msFID": "3175", "gid": "3175", "blad": "400", "punt": "313", "bladdeel": "A", "uitgavejaarext": "2002", "uitgavevolgext": "3", "benaming": "R.K.K. Zevenaar", "ingerekend": "Ja", "honum": "12", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "202357", "yrd": "437737", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/400\/400313.jpg" }, "geometry": { "type": "Point", "coordinates": [ 6.075686484264615, 51.926088797293538 ] } },
+                { "type": "Feature", "properties": { "msFID": "3186", "gid": "3186", "blad": "400", "punt": "324", "bladdeel": "A", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "R.K.K. de Steeg", "ingerekend": "Ja", "honum": "12", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "201242", "yrd": "448129", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/400\/400324.jpg" }, "geometry": { "type": "Point", "coordinates": [ 6.060878859813888, 52.019582623416007 ] } },
+                { "type": "Feature", "properties": { "msFID": "3196", "gid": "3196", "blad": "400", "punt": "513", "bladdeel": "A", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "Zevenaarseweg 6 Angerlo", "ingerekend": "Ja", "honum": "12", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "203150", "yrd": "442871", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/400\/400513.jpg" }, "geometry": { "type": "Point", "coordinates": [ 6.087934423346049, 51.972163379805878 ] } },
+                { "type": "Feature", "properties": { "msFID": "3197", "gid": "3197", "blad": "400", "punt": "518", "bladdeel": "A", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "Rouvenenstraat 9 Duiven", "ingerekend": "Ja", "honum": "12", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "201288", "yrd": "443178", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/400\/400518.jpg" }, "geometry": { "type": "Point", "coordinates": [ 6.060879826130615, 51.975080944237256 ] } },
+                { "type": "Feature", "properties": { "msFID": "3198", "gid": "3198", "blad": "400", "punt": "519", "bladdeel": "A", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "Duiker Zevenaarse wetering - A12", "ingerekend": "Ja", "honum": "12", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "201006", "yrd": "440542", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/400\/400519.jpg" }, "geometry": { "type": "Point", "coordinates": [ 6.056422385625504, 51.951412810854954 ] } },
+                { "type": "Feature", "properties": { "msFID": "3199", "gid": "3199", "blad": "400", "punt": "520", "bladdeel": "C", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "Bruggetje Oud Zevenaar", "ingerekend": "Ja", "honum": "11", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "201094", "yrd": "435691", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/400\/400520.jpg" }, "geometry": { "type": "Point", "coordinates": [ 6.057051770459049, 51.907805994254865 ] } },
+                { "type": "Feature", "properties": { "msFID": "3204", "gid": "3204", "blad": "409", "punt": "204", "bladdeel": "C", "uitgavejaarext": "2001", "uitgavevolgext": "1", "benaming": "H.K. Elst", "ingerekend": "Ja", "honum": "15", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "186782", "yrd": "436905", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/409\/409204.jpg" }, "geometry": { "type": "Point", "coordinates": [ 5.84918642333879, 51.919719313910399 ] } },
+                { "type": "Feature", "properties": { "msFID": "3205", "gid": "3205", "blad": "409", "punt": "205", "bladdeel": "B", "uitgavejaarext": "2001", "uitgavevolgext": "1", "benaming": "R.K.K. Huissen", "ingerekend": "Ja", "honum": "13", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "193102", "yrd": "438945", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/409\/409205.jpg" }, "geometry": { "type": "Point", "coordinates": [ 5.941276469721382, 51.937657476215591 ] } },
+                { "type": "Feature", "properties": { "msFID": "3206", "gid": "3206", "blad": "409", "punt": "206", "bladdeel": "B", "uitgavejaarext": "2003", "uitgavevolgext": "3", "benaming": "R.K.K. Duiven", "ingerekend": "Ja", "honum": "14", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "198732", "yrd": "440287", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/409\/409206.jpg" }, "geometry": { "type": "Point", "coordinates": [ 6.023313490190779, 51.949304583498254 ] } },
+                { "type": "Feature", "properties": { "msFID": "3207", "gid": "3207", "blad": "409", "punt": "207", "bladdeel": "B", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "St. Eusebiuskerk Arnhem", "ingerekend": "Ja", "honum": "14", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "190902", "yrd": "443522", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/409\/409207.jpg" }, "geometry": { "type": "Point", "coordinates": [ 5.909764568422717, 51.978941564166554 ] } },
+                { "type": "Feature", "properties": { "msFID": "3208", "gid": "3208", "blad": "409", "punt": "208", "bladdeel": "A", "uitgavejaarext": "2000", "uitgavevolgext": "3", "benaming": "Gemeentehuis Oosterbeek", "ingerekend": "Ja", "honum": "13", "beheerinfo": "n.v.t", "mutatie": "2", "rekendossier": "0", "xrd": "186239", "yrd": "444567", "gps": "0", "afbeelding": "https:\/\/rdinfo.kadaster.nl\/afbeeldingen\/409\/409208.jpg" }, "geometry": { "type": "Point", "coordinates": [ 5.841991010968675, 51.988615973577154 ] } }
+                ]
+                }
+        },
+        {
+            "id": "b800d6e1-91eb-4a8c-8096-11c055533f9b",
+            "source": "https://service.pdok.nl/kadaster/bestuurlijkegebieden/wfs/v1_0?request=GetFeature&service=WFS&version=2.0.0&outputFormat=application/json&srsname=EPSG:4326&startIndex=0&count=20&typename=bestuurlijkegebieden:Gemeentegebied&bbox=181490.21037169415,426974.7956999999,203370.53037169416,462160.71569999994,EPSG:28992",
+            "color": [
+                255,
+                39,
+                58
+            ],
+            "width": 3,
+            "stroke": [
+                1,
+                6,
+                1,
+                6
+            ],
+            "layerType": "featureLayer",
+            "labels": false,
+            "labelProperty": "naam",
+            "title": "Featurelaag WFS - Polygonen"
+        }
+    ],
+    "location": {
+        "x": 674103.0693749136,
+        "y": 6778624.803135729,
+        "z": 11
+    }
+}

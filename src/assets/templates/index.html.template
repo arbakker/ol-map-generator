@@ -2,9 +2,9 @@
 <html lang="nl">
     <head>
         <meta charset="UTF-8">
-        <title>{{ mapTitle }}</title>
+        <title>{{ title }}</title>
         <script type="module">
-            {{{ jsCode  }}}
+            {{{ jsCode }}}
         </script>
     </head>
     <body>
