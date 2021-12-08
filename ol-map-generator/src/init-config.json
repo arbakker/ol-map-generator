@@ -1,0 +1,255 @@
+{
+    "title": "My Cool Generated Map!",
+    "constrainBoundsEnabled": false,
+    "lsControlEnabled": true,
+    "layers": [
+        {
+            "serviceType": "WMTS",
+            "serviceUrl": "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0",
+            "layerName": "2021_quick_orthoHR",
+            "opacity": 0.5,
+            "grayscale": 1,
+            "layerType": "serviceLayer",
+            "title": "Layer 2"
+        },
+        {
+            "source": "https://service.pdok.nl/kadaster/bestuurlijkegebieden/wfs/v1_0?request=GetFeature&service=WFS&version=2.0.0&outputFormat=application/json&srsname=EPSG:4326&startIndex=0&count=20&typename=bestuurlijkegebieden:Gemeentegebied&bbox=181490.21037169415,426974.7956999999,203370.53037169416,462160.71569999994,EPSG:28992",
+            "color": [
+                18,
+                39,
+                58
+            ],
+            "width": 3,
+            "stroke": [
+                1,
+                6,
+                1,
+                6
+            ],
+            "layerType": "featureLayer",
+            "labels": false,
+            "labelProperty": "naam",
+            "title": "Layer 1"
+        },
+        {
+            "color": [
+                18,
+                39,
+                58
+            ],
+            "title": "Layer 3",
+            "opacity": 1,
+            "labels": false,
+            "labelProperty": "label",
+            "icon": "airport",
+            "iconSize": 3,
+            "layerType": "featureLayer",
+            "source": {
+                "type": "FeatureCollection",
+                "name": "punten",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "muziekmachine"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.9149526,
+                                51.9784253
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "deviezentekort"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.9032386,
+                                51.9832629
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "hoornblazer"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.8936242,
+                                51.9726268
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "omzetontwikkelingen"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.9051535,
+                                51.9687181
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "configuraties"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.9076766,
+                                51.9816731
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "bereisbaar"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.9183032,
+                                51.9873309
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "huisstofmijten"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.9119014,
+                                51.9898272
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "non-events"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.8933674,
+                                51.9552351
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "bezeert"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.8787953,
+                                51.9507506
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "historiek"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.8788695,
+                                51.9663634
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "morsebel"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.8897616,
+                                51.966108
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "instrumentenbouwers"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.9306353,
+                                51.9565941
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "toevloeiden"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.9542404,
+                                51.970361
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "vaccineerde"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.9321758,
+                                51.9797974
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "label": "bevallingsverhaal"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                5.8710351,
+                                51.9964555
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "location": {
+        "x": 674103.0693749136,
+        "y": 6778624.803135729,
+        "z": 11
+    }
+}
