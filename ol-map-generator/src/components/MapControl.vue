@@ -9,7 +9,10 @@
           ></map-map-control>
         </div>
         <div class="row form">
-          <v-form>
+          <v-container
+    class="px-0"
+    fluid
+  >
             <v-text-field v-model="title" label="Map Title"></v-text-field>
             <v-checkbox
               v-model="constrainBoundsEnabled"
@@ -19,27 +22,27 @@
               v-model="lsControlEnabled"
               label="Locatie Server Control Enabled"
             ></v-checkbox>
-            <v-expansion-panels multiple>
-              <draggable v-model="layers">
-                <template v-for="item in layers">
-                  <service-layer-list-item
-                    v-if="item.layerType === 'serviceLayer'"
-                    :key="item.title"
-                    :layer="item"
-                  ></service-layer-list-item>
-                  <feature-layer-list-item
-                    v-if="item.layerType === 'featureLayer'"
-                    :key="item.title"
-                    :layer="item"
-                  ></feature-layer-list-item>
-                </template>
+                      <v-switch
+              v-model="orderLayersEnabled"
+              label="Order Layers"
+            ></v-switch>
+            <v-expansion-panels :disabled="orderLayersEnabled" >
+              <draggable v-model="layers"  :disabled="!orderLayersEnabled">
+                <transition-group>
+                    <layer-list-item
+                      v-for="item in layers"
+                      :key="item.id"
+                      :layer="item"
+                    ></layer-list-item>
+                  
+                </transition-group>
               </draggable>
             </v-expansion-panels>
             <v-btn v-on:click="updateMap()" elevation="2" large
               >Update Map</v-btn>
               <v-btn v-on:click="generateHTML()" elevation="2" large
               >Generate HTML</v-btn>
-          </v-form>
+          </v-container>
         </div>
       </div>
     </v-main>
@@ -48,18 +51,18 @@
 
 <script>
 import draggable from "vuedraggable";
-import ServiceLayerListItem from "./LayerListItem.vue";
-import FeatureLayerListItem from "./FeatureLayerListItem.vue";
+// import ServiceLayerListItem from "./LayerListItem.vue";
+import LayerListItem from "./LayerListItem.vue";
 import MapMapControl from "./MapMapControl.vue";
 
 import htmlTemplate from "raw-loader!../assets/templates/index.html.template";
 import jsTemplate from "raw-loader!../assets/templates/script.js.template";
 
+
 export default {
   components: {
     draggable,
-    ServiceLayerListItem,
-    FeatureLayerListItem,
+    LayerListItem,
     MapMapControl,
   },
   name: "MapControl",
@@ -70,9 +73,15 @@ export default {
     return {
       jsTemplate: jsTemplate,
       htmlTemplate: htmlTemplate,
+      orderLayersEnabled: false
     };
   },
-  mounted: function () {},
+  mounted: function () {
+    
+  },
+  beforeMount: function(){
+    
+  },
   // TODO: replace getters and setters with vuex
   computed: {
     title: {
@@ -88,6 +97,8 @@ export default {
         return this.config.layers;
       },
       set: function (newValue) {
+        console.log("AAAAA")
+        newValue.map(x=> console.log(x.title))
         this.config.layers = newValue;
       },
     },
@@ -116,8 +127,8 @@ export default {
       this.$refs.mapMapControl.generateCode();
     },
     action(e) {
-      if (e === "edit") this.before = Object.assign([], this.items);
-      if (e === "undo") this.items = this.before;
+      if (e === "edit") this.before = Object.assign([], this.layers);
+      if (e === "undo") this.layers = this.before;
       this.editing = !this.editing;
     },
   },

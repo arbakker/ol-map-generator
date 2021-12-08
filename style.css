@@ -121,4 +121,5 @@ body {
     bottom: 1em;
     background-color: #ffffffba;
     padding: 0.5em;
+    z-index: 1000;
 }

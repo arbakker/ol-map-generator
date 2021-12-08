@@ -49,7 +49,6 @@
         v-model="labelProperty"
         label="Label Property"
       ></v-text-field>
-      <!-- stroke style controls -->
       <v-slider
         v-if="isStrokeFeatureLayer"
         v-model="width"
@@ -88,7 +87,7 @@ import availableIcons from "../assets/icons.json";
 
 export default {
   components: {},
-  name: "ServiceLayerListItem",
+  name: "FeatureLayerListItem",
   props: {
     layer: Object,
   },

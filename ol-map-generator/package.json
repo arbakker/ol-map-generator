@@ -12,6 +12,7 @@
     "mustache": "^4.2.0",
     "ol": "^6.9.0",
     "vue": "^2.6.11",
+    "vue-fragment": "^1.5.2",
     "vuedraggable": "^2.24.3",
     "vuetify": "^2.6.1"
   },

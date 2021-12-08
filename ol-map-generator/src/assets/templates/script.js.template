@@ -15,17 +15,185 @@ import 'https://esm.run/mustache@4.2.0/mustache.js';
 let config={{{ config }}}
 
 var map
-if (config.generator){
-    console.log("generator", config)
-    this.$refs["map-root"].innerHTML =''
-    map = new Map({
-    target: this.$refs["map-root"],
-    })
-}else{
-    map = new Map({
+map = new Map({
     target: "map"
+})
+
+{{#lsControlEnabled}}
+ /* LocatieServer Control code */
+ import WKT from 'https://esm.run/ol@6.9.0/src/format/WKT'
+ import { Control } from  'https://esm.run/ol@6.9.0/src/control'
+ class LocatieServerControl extends HTMLElement {
+     constructor () {
+       super()
+       const _style = document.createElement('style')
+       const _template = document.createElement('template')
+       this.LS_STYLE = `
+       button{
+           border: solid 1px #cfd6e6;
+           border-radius: 0 3px 3px 0;
+           border-left: 0px;
+           width: 3em;
+       }
+       .parentControl{
+           background-color: white;
+           height: 36px;
+       }
+       input{
+           outline: none;
+       }
+       input[type=text]{
+           border: solid 1px #cfd6e6;
+           border-radius: 3px;
+           width: 21em;
+           padding-left: 0.5em;
+       }
+       
+       select{
+           border: solid 1px #cfd6e6;
+           border-radius: 3px;
+           width: 10em;
+           padding-left: 0.5em;    
+       }
+       
+       input[type=checkbox] {
+           transform: scale(1.1);
+       }
+       
+       input:focus{
+           border: solid 2px #cfd6e6 !important;
+       }`
+       this.query = ''
+       _style.innerHTML = `
+           ${this.LS_STYLE}
+           #locationServerControl{
+               display: flex;
+               position: absolute;
+               bottom: 2em;
+               right: 2em;
+           }
+           @media only screen and (max-width: 1024px) {
+             #locationServerControl{
+               bottom: 3em;
+               left: 0.5em;
+             }
+           }
+         `
+       _template.innerHTML = `
+           <div id="locationServerControl" class="parentControl">
+               <input autoComplete="off" id="lsInput" class="control" type="text" placeholder="zoek in locatieserver" title="Zoek in PDOK Locatieserver" list="locatie-auto-complete">
+               <datalist id="locatie-auto-complete"></datalist>
+           </div>
+       `
+       this.LOCATIE_SERVER_URL = 'https://geodata.nationaalgeoregister.nl/locatieserver/v3'
+      
+       this.shadow = this.attachShadow({ mode: 'open' })
+       this.shadow.appendChild(_style)
+       this.shadow.appendChild(_template.content.cloneNode(true))
+   
+       this.shadow.getElementById('lsInput').addEventListener('input', (event) => {
+        
+
+         if (event.inputType === 'insertReplacementText' || event.inputType === undefined) {
+           const options = this.shadow.getElementById('locatie-auto-complete').querySelectorAll('option')
+           let id = ''
+           for (let option of options) {
+             if (option.value === event.target.value) {
+               id = option.id
+             }
+           }
+           fetch(`${this.LOCATIE_SERVER_URL}/lookup?id=${id}&fl=id,geometrie_ll`)
+             .then((response) => {
+               return response.json()
+             })
+             .then((data) => {
+               const wktLoc = data.response.docs[0].geometrie_ll
+               const format = new WKT()
+               const feature = format.readFeature(wktLoc, {
+                 dataProjection: 'EPSG:4326',
+                 featureProjection: 'EPSG:3857'
+               })
+               const ext = feature.getGeometry().getExtent()
+               this.dispatchEvent(new CustomEvent('location-selected', { bubbles: true, composed: true, detail: { extent: ext, feature: feature } }))
+               this.shadow.getElementById('locatie-auto-complete').innerHTML = ''
+               this.shadow.getElementById('lsInput').blur()
+             })
+         }else if (event.inputType.startsWith('deleteContent')){
+            if ( event.target.value===""){
+                this.dispatchEvent(new CustomEvent('location-cleared', { bubbles: true, composed: true, detail: { } }))
+            }
+         } 
+       })
+   
+       this.shadow.getElementById('lsInput').addEventListener('keyup', (e) => {
+         if (this.query === e.target.value) {
+           return
+         }
+         this.query = e.target.value
+         fetch(`${this.LOCATIE_SERVER_URL}/suggest?q=${this.query}`)
+           .then((response) => {
+             return response.json()
+           })
+           .then((data) => {
+             if (data.response.docs.length > 0) {
+               let options = data.response.docs.map(x => `<option value="${x.weergavenaam}" id="${x.id}">`)
+               let optionsHtml = options.join('')
+               this.shadow.getElementById('locatie-auto-complete').innerHTML = optionsHtml
+             }
+           })
+       })
+     }
+     connectedCallback () {
+       this.shadow.addEventListener('keydown', (event) => {
+         event.stopPropagation()
+       })
+     }
+   }
+ if (!customElements.get('locatieserver-control')){
+    customElements.define('locatieserver-control', LocatieServerControl)
+ }
+
+ const lsControl = document.createElement('locatieserver-control')
+ const LS_LAYER_ID = 'lsControlLayer'
+function removeLsLayer(){
+    let existingLsLayer = map.getLayers().getArray().find(x=> {
+        return  'values_' in x && x.values_.id === LS_LAYER_ID
     })
+    if (existingLsLayer){
+        map.removeLayer(existingLsLayer)
+    }
 }
+
+ function locationSelectedHandler (event) {
+    let style = polygonStyle({color: [255, 255, 0], stroke: "solid", width: 4 })
+    let ftLayer = new VectorLayer({
+        id: LS_LAYER_ID,
+        declutter: true,
+        source: new VectorSource({
+            features: [event.detail.feature]
+        }),
+        style: new Style(style),
+        opacity: 0.4
+    })
+    removeLsLayer()
+    map.addLayer(ftLayer)
+    map.getView().fit(event.detail.extent, { maxZoom: 18, padding: [30,30,30,30] })
+ }
+
+ function locationClearedHandler () {
+    removeLsLayer()
+ }
+
+ function enableLsControl () {
+     let myControl = new Control({ element: lsControl })
+     map.addControl(myControl)
+     lsControl.addEventListener('location-selected', locationSelectedHandler, false)
+     lsControl.addEventListener('location-cleared', locationClearedHandler, false)
+ }
+ /* LocatieServer Control code */
+ {{/lsControlEnabled}}
+
+
 
 function lineStyle(config) {
     let colorString = `rgb(${config.color[0]},${config.color[1]},${config.color[2]})`;
@@ -115,7 +283,6 @@ function polygonStyle(config) {
 }
 
 function getStyle(config) {
-    console.log(config.geomType)
     const styles = {
     Point: pointStyle,
     LineString: lineStyle,
@@ -242,29 +409,13 @@ function postRender(evt) {
 
 const promises = [];
 
-if (!config.generator){
-    // REMOVE THIS IF BLOCK IN VUEJS APP WHEN COPYING OVER CODE ONLY KEEP ELSE
-    {{ #layersString}}
-    promises.push(
-        getFeatureData(
-            {{{.}}}    
-        )
+{{ #layersString}}
+promises.push(
+    getFeatureData(
+        {{{.}}}
     )
-    {{/layersString}}
-}else{
-    config.layersString = config.layers.map(x=> JSON.stringify(x))
-    let template = `
-    {{ #layersString}}
-    promises.push(
-        getFeatureData(
-            {{{.}}}    
-        )
-    )
-    {{/layersString}}`;
-    let promisesJS = Mustache.render(template, config);
-    eval(promisesJS);
-}
-
+)
+{{/layersString}};
 
 const layers = [];
 // resolve promises with all to maintain layer order
@@ -345,7 +496,7 @@ Promise.all(promises).then((values) => {
     }
 });
 // promise returning viewOptions is expected instead of View object https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html#setView
-let viewConfigTemplate = `
+let viewConfig = 
 {{#location}}
 {
     "center": [{{ x }}, {{ y }}],
@@ -357,15 +508,15 @@ let viewConfigTemplate = `
     "center": [564457.4160, 6783258.6045],
     "zoom": 7
 }
-{{/location}}`;
-let viewConfig = JSON.parse(Mustache.render(viewConfigTemplate, config))
+{{/location}};
+
 // eslint-disable-next-line no-unused-vars
 const viewOptions = new Promise((resolve, reject) => {
     resolve( viewConfig );
 });
+map.setView(viewOptions);
 
-let constrainBoundsTemplate = 
-`{{#constrainBoundsEnabled }}
+{{#constrainBoundsEnabled }}
 map.once('postrender', function(event) {   
     setTimeout(() => {
         let mapExtent = map.getView().calculateExtent(map.getSize())
@@ -379,10 +530,9 @@ map.once('postrender', function(event) {
         map.setView(viewOptions)
     }, 10);
 });
-{{/constrainBoundsEnabled }}`
-let constrainSet = Mustache.render(constrainBoundsTemplate, config)
-eval(constrainSet)
-map.setView(viewOptions);
+{{/constrainBoundsEnabled }}
 
-
+{{#lsControlEnabled}}
+    enableLsControl()
+{{/lsControlEnabled}}
 
