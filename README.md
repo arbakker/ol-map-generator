@@ -1,9 +1,24 @@
-# PDOK Map Generator [POC]
+# ol-map-generator
 
-Proof-of-concept webapplication to generate source code for OpenLayers webmaps with PDOK webservices.
-
-Serve application locally with:
-
+## Project setup
 ```
-python3 -m http.server  
+npm install
 ```
+
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
