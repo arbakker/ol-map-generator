@@ -296,12 +296,19 @@ class MapGenerator {
                 } else if (result.config.layerType === "serviceLayer") {
                     i += 1;
                     if (result.config.serviceType === "WMS") {
+                        let params = {LAYERS: result.config.layerName}
+                        if (result.config.styleName){
+                            params = {
+                                ...params,
+                                ...{ STYLES: result.config.styleName}
+                            }
+                        }
                         layers.push(
                             new ImageLayer({
                                 zIndex: i,
                                 source: new ImageWMS({
                                     url: result.config.serviceUrl,
-                                    params: { LAYERS: result.config.layerName }, // TODO: add style parameter
+                                    params: params, // TODO: add style parameter
                                     ratio: 1,
                                 }),
                                 ...("grayscale" in result.config && {

@@ -8,24 +8,30 @@
             :config="config"
           ></map-map-control>
         </div>
+        
         <div class="row form">
-          <v-container
-    class="px-0"
-    fluid
-  >
+             <v-form>
+            
             <v-text-field v-model="title" label="Map Title"></v-text-field>
+            
             <v-switch
               v-model="constrainBoundsEnabled"
               label="Constrain Map Extent"
+              style="margin-top:0em;"
             ></v-switch>
             <v-switch
+              :disabled="constrainBoundsEnabled"
               v-model="lsControlEnabled"
               label="Locatieserver Control"
+              style="margin-top:0em;"
             ></v-switch>
                       <v-switch
               v-model="orderLayersEnabled"
               label="Order Layers"
+              style="margin-top:0em;"
             ></v-switch>
+
+            
             <v-expansion-panels :disabled="orderLayersEnabled" >
               <draggable v-model="layers"  :disabled="!orderLayersEnabled">
                 <transition-group>
@@ -38,11 +44,12 @@
                 </transition-group>
               </draggable>
             </v-expansion-panels>
+            
             <v-btn v-on:click="updateMap()" elevation="2" large
               >Update Map</v-btn>
-              <v-btn v-on:click="generateHTML()" elevation="2" large
-              >Generate HTML</v-btn>
-          </v-container>
+              <v-btn color="primary" v-on:click="generateHTML()" elevation="2" large
+              >Download HTML</v-btn>
+          </v-form>
         </div>
       </div>
     </v-main>
@@ -96,8 +103,6 @@ export default {
         return this.config.layers;
       },
       set: function (newValue) {
-        console.log("AAAAA")
-        newValue.map(x=> console.log(x.title))
         this.config.layers = newValue;
       },
     },
@@ -106,6 +111,12 @@ export default {
         return this.config.constrainBoundsEnabled;
       },
       set: function (newValue) {
+        if (newValue){
+          // constraining extent and enabling ls control leads to
+          // weird user interaction, what happens if queried object
+          // is outside extent?
+          this.config.lsControlEnabled = false
+        }
         this.config.constrainBoundsEnabled = newValue;
       },
     },
@@ -167,5 +178,11 @@ export default {
 html,
 body {
   height: 100%;
+}
+
+.v-btn{
+  float:left;
+  margin-top: 1em;
+  margin-right: 1em;
 }
 </style>

@@ -10,7 +10,6 @@ import { default as Map } from 'https://esm.run/ol@6.9.0/src/Map';
 import GeoJSON from 'https://esm.run/ol@6.9.0/src/format/GeoJSON';
 import { default as VectorSource } from 'https://esm.run/ol@6.9.0/src/source/Vector';
 import { default as VectorLayer } from 'https://esm.run/ol@6.9.0/src/layer/Vector';
-import 'https://esm.run/mustache@4.2.0/mustache.js';
 import WKT from 'https://esm.run/ol@6.9.0/src/format/WKT';
 import { Control } from 'https://esm.run/ol@6.9.0/src/control';
 

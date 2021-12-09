@@ -94,6 +94,7 @@ export default {
     },
     updateMapTemplate() {
       let config = this.config;
+      console.log(config)
       let map;
       this.$refs["map-root"].innerHTML = "";
       map = new Map({

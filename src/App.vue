@@ -8,6 +8,7 @@
 import MapControl from "./components/MapControl.vue";
 import initConfig from "./init-config.json";
 
+
 export default {
   name: "App",
   data: function () {
@@ -24,7 +25,6 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
