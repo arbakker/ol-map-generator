@@ -14,14 +14,14 @@
     fluid
   >
             <v-text-field v-model="title" label="Map Title"></v-text-field>
-            <v-checkbox
+            <v-switch
               v-model="constrainBoundsEnabled"
-              label="Disable Pan Outside Current Extent"
-            ></v-checkbox>
-            <v-checkbox
+              label="Constrain Map Extent"
+            ></v-switch>
+            <v-switch
               v-model="lsControlEnabled"
-              label="Locatie Server Control Enabled"
-            ></v-checkbox>
+              label="Locatieserver Control"
+            ></v-switch>
                       <v-switch
               v-model="orderLayersEnabled"
               label="Order Layers"
@@ -57,7 +57,6 @@ import MapMapControl from "./MapMapControl.vue";
 
 import htmlTemplate from "raw-loader!../assets/templates/index.html.template";
 import jsTemplate from "raw-loader!../assets/templates/script.js.template";
-
 
 export default {
   components: {

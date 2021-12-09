@@ -4,7 +4,9 @@
         <meta charset="UTF-8">
         <title>{{ title }}</title>
         <script type="module">
-            {{{ jsCode }}}
+
+{{{ jsCode }}}
+
         </script>
     </head>
     <body>
