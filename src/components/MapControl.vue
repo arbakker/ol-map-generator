@@ -8,47 +8,95 @@
             :config="config"
           ></map-map-control>
         </div>
-        
+
         <div class="row form">
-             <v-form>
-            
+          <v-form>
+            <v-card>
+                            
+                <div class="text-overline mb-4">MAP SETTINGS</div>
+            <v-card-text>
             <v-text-field v-model="title" label="Map Title"></v-text-field>
-            
+
             <v-switch
               v-model="constrainBoundsEnabled"
               label="Constrain Map Extent"
-              style="margin-top:0em;"
+              style="margin-top: 0em"
             ></v-switch>
             <v-switch
               :disabled="constrainBoundsEnabled"
               v-model="lsControlEnabled"
               label="Locatieserver Control"
-              style="margin-top:0em;"
+              style="margin-top: 0em"
             ></v-switch>
-                      <v-switch
+            <v-switch
               v-model="orderLayersEnabled"
               label="Order Layers"
-              style="margin-top:0em;"
+              style="margin-top: 0em"
             ></v-switch>
+             <v-card-actions>
+             <v-btn v-on:click="updateMap()" 
+              >Update Map</v-btn
+            >
+            <v-btn
+              color="primary"
+              v-on:click="generateHTML()"
+              >Download HTML</v-btn
+            >
+            </v-card-actions>
+             </v-card-text>
+            </v-card>
+            <v-card>
+              <v-list-item-content style="padding-bottom:0px;">
+                <div class="text-overline mb-4">LAYERS</div>
+                <v-card-actions>
+                  <v-btn v-on:click="orderLayersEnabled=!orderLayersEnabled">Order Layers</v-btn>
+                 <v-speed-dial
+      direction="right"
+    >
+      <template v-slot:activator>
+        <v-btn
+          color="blue darken-2"
+          dark
+          
+        >
+          <v-icon>
+            mdi-plus
+          </v-icon>
+        </v-btn>
+      </template>
+      <v-btn
+        dark
+        small
+      >
+        + Service Layer
+      </v-btn>
+      <v-btn
 
-            
-            <v-expansion-panels :disabled="orderLayersEnabled" >
-              <draggable v-model="layers"  :disabled="!orderLayersEnabled">
-                <transition-group>
-                    <layer-list-item
-                      v-for="item in layers"
-                      :key="item.id"
-                      :layer="item"
-                    ></layer-list-item>
-                  
-                </transition-group>
-              </draggable>
-            </v-expansion-panels>
-            
-            <v-btn v-on:click="updateMap()" elevation="2" large
-              >Update Map</v-btn>
-              <v-btn color="primary" v-on:click="generateHTML()" elevation="2" large
-              >Download HTML</v-btn>
+        dark
+        small
+      >
+       + Feature Layer
+      </v-btn>
+    </v-speed-dial>
+                </v-card-actions>
+                <v-expansion-panels
+                  v-if="!addingLayer"
+                  :disabled="orderLayersEnabled"
+                >
+                  <draggable v-model="layers" :disabled="!orderLayersEnabled">
+                    <transition-group>
+                      <layer-list-item
+                        v-for="item in layers"
+                        :key="item.id"
+                        :layer="item"
+                      ></layer-list-item>
+                    </transition-group>
+                  </draggable>
+                </v-expansion-panels>
+              </v-list-item-content>
+            </v-card>
+
+           
           </v-form>
         </div>
       </div>
@@ -79,15 +127,12 @@ export default {
     return {
       jsTemplate: jsTemplate,
       htmlTemplate: htmlTemplate,
-      orderLayersEnabled: false
+      orderLayersEnabled: false,
+      addingLayer: false,
     };
   },
-  mounted: function () {
-    
-  },
-  beforeMount: function(){
-    
-  },
+  mounted: function () {},
+  beforeMount: function () {},
   // TODO: replace getters and setters with vuex
   computed: {
     title: {
@@ -111,11 +156,11 @@ export default {
         return this.config.constrainBoundsEnabled;
       },
       set: function (newValue) {
-        if (newValue){
+        if (newValue) {
           // constraining extent and enabling ls control leads to
           // weird user interaction, what happens if queried object
           // is outside extent?
-          this.config.lsControlEnabled = false
+          this.config.lsControlEnabled = false;
         }
         this.config.constrainBoundsEnabled = newValue;
       },
@@ -130,10 +175,14 @@ export default {
     },
   },
   methods: {
+    addLayer() {
+      this.addingLayer = !this.addingLayer;
+      console.log(this.addingLayer);
+    },
     updateMap() {
       this.$refs.mapMapControl.updateMap();
     },
-    generateHTML(){
+    generateHTML() {
       this.$refs.mapMapControl.generateCode();
     },
     action(e) {
@@ -180,9 +229,12 @@ body {
   height: 100%;
 }
 
-.v-btn{
-  float:left;
-  margin-top: 1em;
-  margin-right: 1em;
+.v-btn {
+  float: left;
+    margin-right: 1em;
 }
+.v-card{
+  margin-bottom: 1em;
+}
+
 </style>
