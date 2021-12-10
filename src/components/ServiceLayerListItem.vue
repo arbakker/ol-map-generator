@@ -1,10 +1,11 @@
 <template>
-  <v-expansion-panel>
-    <v-expansion-panel-header>
-      {{ title }}
-    </v-expansion-panel-header>
-    <v-expansion-panel-content>
+  <div>
       <v-text-field v-model="title" label="Layer Title"></v-text-field>
+       <v-switch
+              v-model="autoUpdateTitle"
+              label="Auto-Update Title"
+              style="margin-top: 0em"
+            ></v-switch>
       <v-text-field disabled v-model="serviceType" label="Service Type"></v-text-field>
       <v-text-field v-model="serviceUrl" label="Service URL" :rules="serviceUrlRules" required ref="serviceUrl"></v-text-field>  
       <!-- <v-text-field v-model="layerName" label="Layer Name"></v-text-field> -->
@@ -40,8 +41,7 @@
         thumb-label
         label="Grayscale"
       ></v-slider>
-    </v-expansion-panel-content>
-  </v-expansion-panel>
+    </div>
 </template>
 
 <script>
@@ -56,9 +56,14 @@ export default {
   name: "ServiceLayerListItem",
   props: {
     layer: Object,
+    autoUpdateTitle: {
+      type: Boolean,
+      default: true
+    },
   },
   data: function () {
     return {
+      serviceTitle: "",
       layers: [],
       styles: [],
       selectedLayer: {},
@@ -151,6 +156,9 @@ export default {
       }else{
         this.layerName = newVal.Identifier
       }
+      if (this.autoUpdateTitle){
+        this.updateTitle()
+      }
       
     },
     selectedStyle: function (newVal) {
@@ -169,6 +177,10 @@ export default {
     }
   },
   methods: {
+    updateTitle(){
+      let layerTitle = this.selectedLayer.Title
+      this.title = `${this.serviceTitle} - ${layerTitle}` 
+    },
     retrieveCapabilities(){
       if (!this.serviceUrlValid){
         return
@@ -191,6 +203,7 @@ export default {
           const parser = new WMSCapabilities();
           let parsedCap = parser.read(text);
           let layers = [];
+          this.serviceTitle = parsedCap.Service.Title
           layers = this.unpackLayers(parsedCap.Capability, layers);
           // filter out duplicate layers (seems bug in gebiedsindelingen wms)
           layers = layers.filter(
@@ -218,6 +231,9 @@ export default {
           this.selectedStyle = undefined
           if ("Style" in this.selectedLayer){
             this.selectedStyle = (this.styleName) ? this.selectedLayer.Style.find(x=>x.Name === this.styleName): this.selectedLayer.Style[0]
+          }
+          if (this.autoUpdateTitle){
+              this.updateTitle()
           }
         });
     },
@@ -257,11 +273,14 @@ export default {
            this.capXml = text;
             const parser = new WMTSCapabilities();
             let parsedCap = parser.read(text);
-            console.log(parsedCap)
+            this.serviceTitle = parsedCap.ServiceIdentification.Title
             let layers = [];
             layers = parsedCap.Contents.Layer
             this.layers = layers;
-            this.selectedLayer = (this.layerName) ? layers.find(x=> x.Identifier === this.layerName) : layers[0]     
+            this.selectedLayer = (this.layerName) ? layers.find(x=> x.Identifier === this.layerName) : layers[0]
+            if (this.autoUpdateTitle){
+              this.updateTitle()
+            }
       })
 
     },
@@ -298,7 +317,5 @@ a {
   flex-direction: inherit;
 }
 
-.v-expansion-panel {
-  width: 50vw;
-}
+
 </style>

@@ -1,24 +1,20 @@
 <template>
-  <v-expansion-panel>
-    <v-expansion-panel-header>
-      {{ layer.title }}
-    </v-expansion-panel-header>
-    <v-expansion-panel-content>
+  <div>
       <v-text-field v-model="title" label="Layer Title"></v-text-field>
-      <v-radio-group v-model="sourceIsUrl">
+      <v-radio-group v-model="sourceType">
+        <v-radio label="GeoJSON Document" value="object"></v-radio>
         <v-radio label="GeoJSON URL" value="url"></v-radio>
-        <v-radio label="GeoJSON Document" value="document"></v-radio>
       </v-radio-group>
       <v-text-field
-        v-if="sourceIsUrl === 'url'"
-        v-model="source"
+        v-if="sourceType === 'url'"
+        v-model="geoJsonUrl"
         label="GeoJSON URL"
       ></v-text-field>
       <v-textarea
-        v-if="sourceIsUrl === 'document'"
+        v-if="sourceType === 'object'"
         label="GeoJSON Document"
-        v-model="sourceDocument"
         hint="Hint text"
+        @blur="geoJsonString = $event.target.value"
       ></v-textarea>
       <v-slider
         v-model="opacity"
@@ -50,7 +46,7 @@
         label="Label Property"
       ></v-text-field>
       <v-slider
-        v-if="isStrokeFeatureLayer"
+        v-if="geomType !== '' && geomType!=='Point'"
         v-model="width"
         step="1"
         min="0"
@@ -59,12 +55,12 @@
         label="Stroke Width"
       ></v-slider>
       <v-text-field
-        v-if="isStrokeFeatureLayer"
+        v-if="geomType !== '' && geomType!=='Point'"
         v-model="stroke"
         :rules="strokeRules"
       ></v-text-field>
       <v-slider
-        v-if="!isStrokeFeatureLayer"
+        v-if="geomType !== '' && geomType==='Point'"
         v-model="iconSize"
         step="1"
         min="0"
@@ -73,13 +69,12 @@
         label="Icon Size"
       ></v-slider>
       <v-select
-        v-if="!isStrokeFeatureLayer"
+        v-if="geomType !== '' && geomType==='Point'"
         :items="icons"
         v-model="icon"
         label="Icon"
       ></v-select>
-    </v-expansion-panel-content>
-  </v-expansion-panel>
+    </div>
 </template>
 
 <script>
@@ -106,12 +101,47 @@ export default {
     };
   },
   computed: {
-    source: {
+    sourceType: {
       get: function () {
-        return this.layer.source;
+        return this.layer.sourceType;
       },
       set: function (newValue) {
-        this.layer.source = newValue;
+        this.layer.sourceType = newValue;
+      },
+    },
+    geoJsonUrl: {
+      get: function () {
+        return this.layer.geoJsonUrl;
+      },
+      set: function (newValue) {
+        this.layer.geoJsonUrl = newValue;
+      },
+    },
+    geomType: {
+      get: function () {
+        return this.layer.geomType;
+      },
+      set: function (newValue) {
+        this.layer.geomType = newValue;
+      },
+    },
+    geoJsonString: {
+      get: function () {
+        return JSON.stringify(this.geoJson)
+      },
+      set: function (newValue) {
+        console.log(newValue)
+        this.geoJson = JSON.parse(newValue)
+      },
+    },
+    geoJson: {
+      get: function () {
+        return this.layer.geoJson
+      },
+      set: function (newValue) {
+        this.layer.geoJson = newValue
+        console.log('set geoJson', newValue)
+        this.setSourceGeomType()
       },
     },
     labels: {
@@ -203,31 +233,6 @@ export default {
         this.layer.color = [newValue.r, newValue.g, newValue.b];
       },
     },
-    isStrokeFeatureLayer: function () {
-      // TODO:  add case when  source isnot url
-      if (this.sourceIsUrl !== "url") {
-        let geomType = this.source.features[0].geometry.type;
-        geomType = geomType.replace("Multi", "");
-        if (geomType === "Point") {
-          return false;
-        }
-      }
-      return true;
-    },
-    sourceDocument: function () {
-      return JSON.stringify(this.source);
-    },
-    sourceIsUrl: function () {
-      let url;
-      try {
-        url = new URL(this.source);
-      } catch (_) {
-        return "document";
-      }
-      return url.protocol === "http:" || url.protocol === "https:"
-        ? "url"
-        : "document";
-    },
   },
   mounted: function () {},
   beforeMount() {
@@ -243,9 +248,54 @@ export default {
       handler: function (old_val, new_val) {
         console.log(old_val, new_val);
       },
+    "icon": {
+      handler: function(old_val, new_val){
+        this.getIcon(new_val).then(function(result){
+          console.log(result)
+          this.icon = result
+        })
+        
+      }
+    } 
+
     },
   },
-  methods: {},
+  methods: {
+
+    async getIcon() {
+      console.log('getIcon')
+      let svgUrl = `./icons/${this.icon}.svg`;
+      let response = await fetch(svgUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      let svgIcon = await response.text();
+      const regexpSize = /(<path .*?\/>)/;
+      const match = svgIcon.match(regexpSize);
+      let pathEl = match[1];
+      let pathElBg = pathEl.replace(
+        "<path",
+        '<path stroke="#ffffffCC" stroke-width="2px"'
+      );
+      svgIcon = svgIcon.replace(regexpSize, `${pathElBg}$&`);
+      svgIcon = svgIcon.replace(
+        'viewBox="0 0 15 15"',
+        'viewBox="-2 -2 19 19"'
+      );
+      return svgIcon.replace(/\n/g, "");
+    },
+    setSourceGeomType(){
+      let geomType
+      if (this.sourceType === "object"){
+        geomType = this.geoJson.features[0].geometry.type;
+      }else if (this.sourceType === "url"){
+        geomType = this.geoJson.features[0].geometry.type;
+      }
+      console.log(geomType.replace("Multi", ""));
+      this.geomType = geomType.replace("Multi", "");
+      console.log(this.geomType)
+    }
+  },
 };
 </script>
 

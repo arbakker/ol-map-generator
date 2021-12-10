@@ -47,12 +47,9 @@ export default {
         "data:text/plain;charset=utf-8," + encodeURIComponent(text)
       );
       element.setAttribute("download", filename);
-
       element.style.display = "none";
       document.body.appendChild(element);
-
       element.click();
-
       document.body.removeChild(element);
     },
     getPrepareGenPromises() {
@@ -169,38 +166,9 @@ export default {
       }
       return await response.text();
     },
+    // eslint-disable-next-line no-unused-vars
     async getFeatureDataAndIcon(ftLayer) {
-      if (ftLayer.layerType === "serviceLayer") {
-        return;
-      }
-      // eslint-disable-next-line no-unused-vars
-      const geomType = await new Promise((resolve, _reject) => {
-        resolve(this.getGeometryType(ftLayer));
-      });
-      ftLayer.geomType = geomType;
-      if (geomType === "Point") {
-        if (!("icon" in ftLayer)) {
-          ftLayer.icon = "circle";
-        }
-        let svgUrl = `./icons/${ftLayer.icon}.svg`;
-        // eslint-disable-next-line no-unused-vars
-        let svgIcon = await new Promise((resolve, _reject) => {
-          resolve(this.getResourceText(svgUrl));
-        });
-        const regexpSize = /(<path .*?\/>)/;
-        const match = svgIcon.match(regexpSize);
-        let pathEl = match[1];
-        let pathElBg = pathEl.replace(
-          "<path",
-          '<path stroke="#ffffffCC" stroke-width="2px"'
-        );
-        svgIcon = svgIcon.replace(regexpSize, `${pathElBg}$&`);
-        svgIcon = svgIcon.replace(
-          'viewBox="0 0 15 15"',
-          'viewBox="-2 -2 19 19"'
-        );
-        ftLayer.svgIcon = svgIcon.replace(/\n/g, "");
-      }
+      return
     },
     htmlEncode(s) {
       var el = document.createElement("div");

@@ -1,15 +1,26 @@
 <template>
-    <div class="expansion-panel-wrapper">
-        <service-layer-list-item
+      <v-expansion-panel >
+    <v-expansion-panel-header>
+      {{ layer.title }} 
+    </v-expansion-panel-header>
+    <v-expansion-panel-content>
+      
+              <service-layer-list-item
                             v-if="layer.layerType === 'serviceLayer'"
                             :layer="layer"
                         ></service-layer-list-item>
         <feature-layer-list-item
                 v-if="layer.layerType === 'featureLayer'"
-            :layer="layer"
-        ></feature-layer-list-item>
-        
-    </div>
+            :layer="layer">
+        </feature-layer-list-item>
+         <v-card-actions >
+        <v-btn    
+   @click="deleteLayer()" title="Delete Layer"><v-icon>
+            mdi-delete
+          </v-icon></v-btn>
+</v-card-actions>
+    </v-expansion-panel-content>
+    </v-expansion-panel>
 </template>
 
 <script>
@@ -34,6 +45,9 @@ export default {
   beforeMount() {
   },
   methods: {
+    deleteLayer(){
+      this.$emit('deleteLayer', this.layer)
+    }
   },
 };
 </script>
@@ -43,4 +57,7 @@ export default {
     .expansion-panel-wrapper{
         border-bottom: solid 1px rgb(218, 218, 218);
     }
+    .v-expansion-panel {
+  width: 50vw;
+}
 </style>

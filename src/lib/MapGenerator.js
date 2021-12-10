@@ -122,6 +122,7 @@ class MapGenerator {
             LineString: MapGenerator.lineStyle,
             Polygon: MapGenerator.polygonStyle,
         };
+        console.log('getstyle', layerConfig)
         let style = styles[layerConfig.geomType];
         if (
             typeof layerConfig.color === "string" &&
@@ -200,11 +201,11 @@ class MapGenerator {
     static async getFeatureData (layerConfig) {
         if (layerConfig.layerType === "featureLayer") {
             let ftCollection;
-            if (MapGenerator.isValidHttpUrl(layerConfig.source)) {
-                let ftCollectionString = await MapGenerator.getResourceText(layerConfig.source);
+            if (layerConfig.sourceType === "url"){
+                let ftCollectionString = await MapGenerator.getResourceText(layerConfig.geoJsonUrl);
                 ftCollection = JSON.parse(ftCollectionString);
-            } else {
-                ftCollection = layerConfig.source;
+            }else if (layerConfig.sourceType === "object"){
+                ftCollection = layerConfig.geoJson;
             }
             return { ftCollection: ftCollection, config: layerConfig };
         } else {
