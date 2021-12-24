@@ -242,7 +242,9 @@ export default {
         iconSize: 2,
         layerType: "featureLayer",
         sourceType: "object",
-        geoJson: {}
+        geomType: "",
+        geoJson: {},
+        svgIcon: ""
       };
     },
     addNewLayer() {

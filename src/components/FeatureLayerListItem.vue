@@ -130,8 +130,9 @@ export default {
         return JSON.stringify(this.geoJson)
       },
       set: function (newValue) {
-        console.log(newValue)
+        console.log('set geoJsonString',newValue)
         this.geoJson = JSON.parse(newValue)
+        this.setSourceGeomType()
       },
     },
     geoJson: {
@@ -141,7 +142,6 @@ export default {
       set: function (newValue) {
         this.layer.geoJson = newValue
         console.log('set geoJson', newValue)
-        this.setSourceGeomType()
       },
     },
     labels: {
@@ -173,7 +173,11 @@ export default {
         return this.layer.icon;
       },
       set: function (newValue) {
+        console.log('set icon', newValue)
         this.layer.icon = newValue;
+        this.getIcon(newValue).then(result=>{
+          this.layer.svgIcon = result
+        })
       },
     },
     title: {
@@ -248,15 +252,10 @@ export default {
       handler: function (old_val, new_val) {
         console.log(old_val, new_val);
       },
-    "icon": {
-      handler: function(old_val, new_val){
-        this.getIcon(new_val).then(function(result){
-          console.log(result)
-          this.icon = result
-        })
+      icon(new_val) {
+        console.log('watch icon',new_val)
         
-      }
-    } 
+      } 
 
     },
   },
@@ -291,9 +290,8 @@ export default {
       }else if (this.sourceType === "url"){
         geomType = this.geoJson.features[0].geometry.type;
       }
-      console.log(geomType.replace("Multi", ""));
-      this.geomType = geomType.replace("Multi", "");
-      console.log(this.geomType)
+      let newGeomType =  geomType.replace("Multi", "");
+      this.geomType = newGeomType
     }
   },
 };
