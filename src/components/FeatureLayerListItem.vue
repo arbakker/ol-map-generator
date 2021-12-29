@@ -14,7 +14,8 @@
         v-if="sourceType === 'object'"
         label="GeoJSON Document"
         hint="Hint text"
-        @blur="geoJsonString = $event.target.value"
+        v-model="geoJsonString"
+        
       ></v-textarea>
       <v-slider
         v-model="opacity"
@@ -23,14 +24,6 @@
         max="1"
         thumb-label
         label="Opacity"
-      ></v-slider>
-      <v-slider
-        v-model="grayscale"
-        step="0.01"
-        min="0"
-        max="1"
-        thumb-label
-        label="Grayscale"
       ></v-slider>
       <v-color-picker
         v-model="color"
@@ -63,8 +56,8 @@
         v-if="geomType !== '' && geomType==='Point'"
         v-model="iconSize"
         step="1"
-        min="0"
-        max="20"
+        min="1"
+        max="10"
         thumb-label
         label="Icon Size"
       ></v-slider>
@@ -78,6 +71,7 @@
 </template>
 
 <script>
+//@blur="geoJsonString = $event.target.value"
 import availableIcons from "../assets/icons.json";
 
 export default {
@@ -204,14 +198,6 @@ export default {
         this.layer.opacity = newValue;
       },
     },
-    grayscale: {
-      get: function () {
-        return this.layer.grayscale;
-      },
-      set: function (newValue) {
-        this.layer.grayscale = newValue;
-      },
-    },
     stroke: {
       get: function () {
         if (!this.layer.stroke) {
@@ -238,7 +224,8 @@ export default {
       },
     },
   },
-  mounted: function () {},
+  mounted: function () {
+  },
   beforeMount() {
     if (!("opacity" in this.layer)) {
       this.layer.opacity = 1;
@@ -248,16 +235,6 @@ export default {
     }
   },
   watch: {
-    "actLayer.visible": {
-      handler: function (old_val, new_val) {
-        console.log(old_val, new_val);
-      },
-      icon(new_val) {
-        console.log('watch icon',new_val)
-        
-      } 
-
-    },
   },
   methods: {
 

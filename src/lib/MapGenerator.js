@@ -21,6 +21,7 @@ export { MapGenerator as default };
 // CODEBODY //
 const DEFAULT_STROKE_WIDTH = 2
 const DEFAULT_ICON_SCALE = 1.5
+const DEFAULT_SCALE_FACTOR = 0.3
 const DEFAULT_DASHES = {
     "dashed": {
         lineDash: [4],
@@ -50,15 +51,17 @@ class MapGenerator {
             scale = layerConfig.iconSize;
         }
         let i = 0;
+        console.log(layerConfig.hexColor)
         let icon = layerConfig.svgIcon.replace(/<path/g, (match) =>
             ++i === 2 ? `<path fill="#${layerConfig.hexColor}"` : match
         );
+        console.log(icon)
         const src = "data:image/svg+xml;utf8," + escape(icon);
         return {
             image: new Icon({
                 opacity: 1,
                 src: src,
-                scale: scale,
+                scale: 1 + scale * DEFAULT_SCALE_FACTOR,
             }),
         };
     }
@@ -205,6 +208,7 @@ class MapGenerator {
                 let ftCollectionString = await MapGenerator.getResourceText(layerConfig.geoJsonUrl);
                 ftCollection = JSON.parse(ftCollectionString);
             }else if (layerConfig.sourceType === "object"){
+
                 ftCollection = layerConfig.geoJson;
             }
             return { ftCollection: ftCollection, config: layerConfig };

@@ -154,7 +154,10 @@ export default {
       newLayer: {},
     };
   },
-  mounted: function () {},
+  mounted: function () {
+    console.log("MapControl mounted")
+
+  },
   beforeMount: function () {},
   // TODO: replace getters and setters with vuex
   computed: {

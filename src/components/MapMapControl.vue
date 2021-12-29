@@ -35,8 +35,13 @@ export default {
     };
   },
   mounted: function () {
+    console.log("MapMapControl mounted")
     this.config.generator = true;
-    this.updateMap();
+    let promises = this.getPrepareGenPromises();      
+    Promise.all(promises).then(() => {  
+      console.log(this.config)
+      this.updateMap();
+    })
   },
   // TODO: replace getters and setters with vuex
   methods: {
@@ -55,7 +60,7 @@ export default {
     getPrepareGenPromises() {
       let promises = [];
       this.config.layers.forEach((x) => {
-        if ("color" in x) {
+        if ("color" in x && !("hexColor" in x)) {
           // TODO: use default color
           x.hexColor = this.rgba2hex(x.color);
         }

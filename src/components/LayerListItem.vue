@@ -41,7 +41,10 @@ export default {
   // TODO: replace with vuex
   computed:{
   },
-  mounted: function () {},
+  mounted: function () {
+    console.log("LayerListItem mounted")
+
+  },
   beforeMount() {
   },
   methods: {
