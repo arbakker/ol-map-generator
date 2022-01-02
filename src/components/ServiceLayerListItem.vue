@@ -6,9 +6,28 @@
               label="Auto-Update Title"
               style="margin-top: 0em"
             ></v-switch>
-      <v-text-field disabled v-model="serviceType" label="Service Type"></v-text-field>
-      <v-text-field v-model="serviceUrl" label="Service URL" :rules="serviceUrlRules" required ref="serviceUrl"></v-text-field>  
-      <!-- <v-text-field v-model="layerName" label="Layer Name"></v-text-field> -->
+      <v-text-field disabled v-model="serviceType" label="Service Type"></v-text-field> 
+       <v-radio-group v-model="inputMode">
+        <v-radio label="Search in PDOK Services" value="search"></v-radio>
+        <v-radio label="Input Service URL" value="input"></v-radio>
+      </v-radio-group>
+
+      <v-text-field
+          v-show="inputMode === 'search'"
+          type="text"
+          v-model="query"
+          list="searchResults"
+          @keyup="search"
+          @input="checkSelected"
+          :placeholder="
+            'zoek in PDOK services'
+          "
+        />
+        <datalist id="searchResults">
+            <option v-for="item in displayItems" :key="item.id">{{item.title}}</option>
+        </datalist>
+      <v-text-field
+ v-model="displayServiceUrl" label="Service URL" :rules="serviceUrlRules" required ref="serviceUrl"></v-text-field>  
       <v-select
         :items="layers"
         v-model="selectedLayer"
@@ -22,7 +41,6 @@
         v-model="selectedStyle"
         item-text="Title"
         return-object
-
         label="Style"
       ></v-select>
       <v-slider
@@ -47,8 +65,8 @@
 <script>
 import WMSCapabilities from "ol/format/WMSCapabilities";
 import WMTSCapabilities from "ol/format/WMTSCapabilities";
-
-
+import Fuse from "fuse.js";
+import pdokServices from '../assets/pdok-wms-wmts-services-with-urls.json'
 // other imports
 
 export default {
@@ -64,6 +82,10 @@ export default {
   data: function () {
     return {
       serviceTitle: "",
+      inputMode: "search",
+      displayItems: [], 
+      displayServiceUrl: "",
+      query: "",
       layers: [],
       styles: [],
       selectedLayer: {},
@@ -86,19 +108,6 @@ export default {
         },
         set: function (newValue) {
             this.layer.title = newValue
-        }
-      },
-      serviceUrl: {
-        get: function () {
-            return  this.layer.serviceUrl
-        },
-        set: function (newValue) {
-            this.layer.serviceUrl = newValue
-            let serviceType = this.getServiceType()
-            this.serviceType = serviceType
-            setTimeout(() => {
-                this.retrieveCapabilities()
-            }, 1);
         }
       },
       layerName: {
@@ -144,13 +153,22 @@ export default {
       serviceUrlValid: { 
         get: function(){
           const pattern = /^https?.*\?.*service=(WMS|WMTS).*$/i;
-          return (pattern.test(this.serviceUrl))
+          return (pattern.test(this.displayServiceUrl))
         }
       },
   },
    watch: {
+    displayServiceUrl: function (newVal){
+      let url = new URL(newVal);
+      let urlString =  `${url.protocol}${url.hostname}${url.pathname}`
+      this.layer.serviceUrl = urlString
+      let serviceType = this.getServiceType()
+            this.serviceType = serviceType
+            setTimeout(() => {
+                this.retrieveCapabilities()
+            }, 1);
+    },
     selectedLayer: function (newVal) {
-      console.log('selectedLayer', newVal)
       if (this.serviceType === "WMS"){
         this.layerName = newVal.Name
       }else{
@@ -167,6 +185,7 @@ export default {
   },
   mounted: function () {
     this.retrieveCapabilities()
+    this.init(pdokServices)
   },
   beforeMount() {
     if (!("opacity" in this.layer)) {
@@ -177,6 +196,44 @@ export default {
     }
   },
   methods: {
+    init(result) {
+      // filter out duplicate records, ngr returns duplicated records occasionally
+      result = result.filter(
+        (v, i, a) => a.findIndex((t) => t.id === v.id) === i
+      );
+      this.records = result;
+      this.displayItems = result;
+      const options = {
+        shouldSort: true,
+        threshold: 0.3,
+        location: 0,
+        distance: 100,
+        minMatchCharLength: 3,
+        ignoreLocation: true,
+        keys: ["title", "abstract", "keywords", "id", "serviceUrl", "serviceType"],
+      };
+      this.fuse = new Fuse(this.records, options);
+      this.search();
+    },
+     searchFilter() {
+      if (this.query === "") {
+        return this.records;
+      }
+      const searchResult = this.fuse.search(this.query, {});
+      return searchResult.map(({ item }) => item).sort(this.compare);
+    },
+    checkSelected(){
+        let item = this.displayItems.find(element => element.title === this.query)
+        if (item!==undefined){
+          this.displayServiceUrl = item.serviceUrl
+        }
+ },
+     search() {
+      setTimeout(() => {
+        this.displayItems = this.searchFilter();
+      }, 300);
+      
+    },
     updateTitle(){
       let layerTitle = this.selectedLayer.Title
       this.title = `${this.serviceTitle} - ${layerTitle}` 
@@ -192,7 +249,7 @@ export default {
       }
     },
     retrieveCapabilitiesWMS(){
-      let url = new URL(this.serviceUrl);
+      let url = new URL(this.displayServiceUrl);
       let urlString =  `${url.protocol}${url.hostname}${url.pathname}?request=GetCapabilities&service=WMS`;
       fetch(urlString)
         .then((response) => {
@@ -263,7 +320,7 @@ export default {
       return result;
     },
     retrieveCapabilitiesWMTS(){
-      let url = new URL(this.serviceUrl);
+      let url = new URL(this.displayServiceUrl);
       let urlString = `${url.protocol}${url.hostname}${url.pathname}?request=GetCapabilities&service=WMTS`;
        fetch(urlString)
         .then((response) => {
@@ -285,7 +342,7 @@ export default {
 
     },
     getServiceType(){
-      var url = new URL(this.serviceUrl.toUpperCase());
+      var url = new URL(this.displayServiceUrl.toUpperCase());
       return url.searchParams.get("SERVICE");
     }
   },

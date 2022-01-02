@@ -51,11 +51,9 @@ class MapGenerator {
             scale = layerConfig.iconSize;
         }
         let i = 0;
-        console.log(layerConfig.hexColor)
         let icon = layerConfig.svgIcon.replace(/<path/g, (match) =>
             ++i === 2 ? `<path fill="#${layerConfig.hexColor}"` : match
         );
-        console.log(icon)
         const src = "data:image/svg+xml;utf8," + escape(icon);
         return {
             image: new Icon({
@@ -125,7 +123,6 @@ class MapGenerator {
             LineString: MapGenerator.lineStyle,
             Polygon: MapGenerator.polygonStyle,
         };
-        console.log('getstyle', layerConfig)
         let style = styles[layerConfig.geomType];
         if (
             typeof layerConfig.color === "string" &&

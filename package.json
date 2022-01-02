@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "fuse.js": "^6.5.3",
     "mustache": "^4.2.0",
     "ol": "^6.9.0",
     "vue": "^2.6.14",

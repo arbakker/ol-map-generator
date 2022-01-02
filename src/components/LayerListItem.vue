@@ -42,7 +42,6 @@ export default {
   computed:{
   },
   mounted: function () {
-    console.log("LayerListItem mounted")
 
   },
   beforeMount() {

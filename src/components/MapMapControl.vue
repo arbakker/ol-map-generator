@@ -35,11 +35,9 @@ export default {
     };
   },
   mounted: function () {
-    console.log("MapMapControl mounted")
     this.config.generator = true;
     let promises = this.getPrepareGenPromises();      
     Promise.all(promises).then(() => {  
-      console.log(this.config)
       this.updateMap();
     })
   },
@@ -96,7 +94,6 @@ export default {
     },
     updateMapTemplate() {
       let config = this.config;
-      console.log(config)
       let map;
       this.$refs["map-root"].innerHTML = "";
       map = new Map({
@@ -122,7 +119,7 @@ export default {
       this.config.generator = true;
       let promises = this.getPrepareGenPromises();
       Promise.all(promises).then(() => {
-        this.config.layers.map((x) => console.log(x.title));
+        // this.config.layers.map((x) => console.log(x.title));
         // template starts here
         // replace config declaration in actual template
         this.updateMapTemplate();

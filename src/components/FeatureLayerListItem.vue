@@ -124,7 +124,6 @@ export default {
         return JSON.stringify(this.geoJson)
       },
       set: function (newValue) {
-        console.log('set geoJsonString',newValue)
         this.geoJson = JSON.parse(newValue)
         this.setSourceGeomType()
       },
@@ -135,7 +134,6 @@ export default {
       },
       set: function (newValue) {
         this.layer.geoJson = newValue
-        console.log('set geoJson', newValue)
       },
     },
     labels: {
@@ -167,7 +165,6 @@ export default {
         return this.layer.icon;
       },
       set: function (newValue) {
-        console.log('set icon', newValue)
         this.layer.icon = newValue;
         this.getIcon(newValue).then(result=>{
           this.layer.svgIcon = result
@@ -239,7 +236,6 @@ export default {
   methods: {
 
     async getIcon() {
-      console.log('getIcon')
       let svgUrl = `./icons/${this.icon}.svg`;
       let response = await fetch(svgUrl);
       if (!response.ok) {
