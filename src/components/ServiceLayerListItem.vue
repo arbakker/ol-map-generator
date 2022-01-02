@@ -160,7 +160,7 @@ export default {
    watch: {
     displayServiceUrl: function (newVal){
       let url = new URL(newVal);
-      let urlString =  `${url.protocol}${url.hostname}${url.pathname}`
+      let urlString =  `${url.protocol}//${url.hostname}${url.pathname}`
       this.layer.serviceUrl = urlString
       let serviceType = this.getServiceType()
             this.serviceType = serviceType
@@ -250,7 +250,7 @@ export default {
     },
     retrieveCapabilitiesWMS(){
       let url = new URL(this.displayServiceUrl);
-      let urlString =  `${url.protocol}${url.hostname}${url.pathname}?request=GetCapabilities&service=WMS`;
+      let urlString =  `${url.protocol}//${url.hostname}${url.pathname}?request=GetCapabilities&service=WMS`;
       fetch(urlString)
         .then((response) => {
           return response.text();
@@ -321,7 +321,7 @@ export default {
     },
     retrieveCapabilitiesWMTS(){
       let url = new URL(this.displayServiceUrl);
-      let urlString = `${url.protocol}${url.hostname}${url.pathname}?request=GetCapabilities&service=WMTS`;
+      let urlString = `${url.protocol}//${url.hostname}${url.pathname}?request=GetCapabilities&service=WMTS`;
        fetch(urlString)
         .then((response) => {
           return response.text();
