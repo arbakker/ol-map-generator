@@ -203,9 +203,8 @@ class MapGenerator {
             let ftCollection;
             if (layerConfig.sourceType === "url"){
                 let ftCollectionString = await MapGenerator.getResourceText(layerConfig.geoJsonUrl);
-                ftCollection = JSON.parse(ftCollectionString);
+                ftCollection = JSON.parse(ftCollectionString);           
             }else if (layerConfig.sourceType === "object"){
-
                 ftCollection = layerConfig.geoJson;
             }
             return { ftCollection: ftCollection, config: layerConfig };

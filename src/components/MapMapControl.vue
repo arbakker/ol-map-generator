@@ -26,6 +26,7 @@ export default {
   name: "MapControl",
   props: {
     config: Object,
+    viewExtent: []
   },
   data: function () {
     return {
@@ -73,12 +74,11 @@ export default {
     generateCode() {
       let promises = this.getPrepareGenPromises();
       this.config.generator = false;
+      
       Promise.all(promises).then(() => {  
         this.updateMapTemplate();
-        
         let mapGeneratorCodeBody = mapGeneratorJS.split(`// CODEBODY //\n`)[1]
         let lsControlCodeBody = locatieServerControlJs.split(`// CODEBODY //\n`)[1]
-      
         let renderConfig = {
           config: JSON.stringify(this.config),
           lsControlCode:  lsControlCodeBody,
@@ -92,6 +92,7 @@ export default {
         this.download("index.html", htmlCode);
       });
     },
+
     updateMapTemplate() {
       let config = this.config;
       let map;
@@ -99,7 +100,11 @@ export default {
       map = new Map({
         target: this.$refs["map-root"],
       });
-
+      map.on('moveend', function(e){
+        console.log(e)
+        console.log(e.map.getView().calculateExtent(e.map.getSize())
+      )
+      });
       if (config.lsControlEnabled) {
         if (!customElements.get(LocatieServerControl.name)) {
           customElements.define(

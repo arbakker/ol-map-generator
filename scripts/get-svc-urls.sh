@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-SERVICES_JSON="src/assets/pdok-wms-wmts-services.json"
+INPUT_JSON=$1 #src/assets/pdok-wms-wmts-services.json"
+OUTPUT_JSON=$2
 
 function get-xpath-text(){
     xml_doc="$1"
@@ -32,8 +33,8 @@ while read -r LINE;do
     json_line=$(jq  -c ".serviceUrl = \"${SERVICE_URL}\"" <<< $LINE | sed "s/\r/\\r/" | sed "s/\n/\\n/")
     result="${json_line}${result}"
     count=$(bc<<<"$count+1")
-done <<<$(jq -c '.[]' < $SERVICES_JSON)
+done <<<$(jq -c '.[]' < $INPUT_JSON)
 
 echo "##############"
 echo "$result"
-jq -s '.' <<< "$result" > src/assets/pdok-wms-wmts-services-with-urls.json
+jq -s '.' <<< "$result" > "$OUTPUT_JSON" #src/assets/pdok-wms-wmts-services-with-urls.json
