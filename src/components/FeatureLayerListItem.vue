@@ -146,11 +146,11 @@ export default {
       capXml: "",
       query: "",
       displayItems: [],
+      selectedFeatureType: null,
       serviceTitle: "",
       icons: availableIcons,
       displayServiceUrl: "",
       featureTypes: [],
-      selectedFeatureType: null,
       geojsonRules: [
         (value) => {
           try {
@@ -174,6 +174,15 @@ export default {
     };
   },
   computed: {
+    // selectedFeatureType: {
+    //   get: function () {
+    //     return this.layer.featureType;
+    //   },
+    //   set: function (newValue) {
+    //     console.log("set selectedFeatureType: "+ JSON.stringify(newValue))
+    //     this.layer.featureType = newValue;
+    //   },
+    // },
     sourceType: {
       get: function () {
         return this.layer.sourceType;
@@ -203,6 +212,7 @@ export default {
         return this.layer.geomType;
       },
       set: function (newValue) {
+        console.log("geomtype"+ newValue)
         this.layer.geomType = newValue;
       },
     },
@@ -323,7 +333,9 @@ export default {
     }
   },
   watch: {
-    selectedFeatureType: function(){
+    selectedFeatureType(newVal){
+      this.layer.featureType = newVal;
+      console.log("watch selectedFeatureType")
       if (this.autoUpdateTitle){
         this.updateTitle()
       }
@@ -379,7 +391,6 @@ export default {
           });
           this.serviceTitle = wfsObject.value.serviceIdentification.title[0].value
           this.selectedFeatureType = this.featureTypes[0]
-         
         });
     },
     init(result) {
