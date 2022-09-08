@@ -109,6 +109,7 @@ export default {
       },
       set: function (newValue) {
         this.layer.geoJsonUrl = newValue;
+        this.setSourceGeomType()
       },
     },
     geomType: {
@@ -257,14 +258,20 @@ export default {
       return svgIcon.replace(/\n/g, "");
     },
     setSourceGeomType(){
-      let geomType
+      let prom  
       if (this.sourceType === "object"){
-        geomType = this.geoJson.features[0].geometry.type;
+        prom = new Promise((resolve) => {
+          resolve(this.geoJson);
+        });
       }else if (this.sourceType === "url"){
-        geomType = this.geoJson.features[0].geometry.type;
+        prom = fetch(this.layer.geoJsonUrl).then(response =>response.json())
       }
-      let newGeomType =  geomType.replace("Multi", "");
-      this.geomType = newGeomType
+      prom.then(data=>{
+        let geomType = data.features[0].geometry.type
+        let newGeomType =  geomType.replace("Multi", "");
+        this.geomType = newGeomType 
+      })
+      
     }
   },
 };
